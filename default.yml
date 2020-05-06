@@ -20,7 +20,7 @@ before_script:
     fi
   - echo "${CI_REGISTRY_PASSWORD}" | docker login --username "${CI_REGISTRY_USER}" --password-stdin "${CI_REGISTRY}"
   # Work out some things we may need below
-  - export TIMESTAMP=$(cat .TIMESTAMP || date +%y%m%d%H%M%S | tee .TIMESTAMP)
+  - export TIMESTAMP=$(cat .TIMESTAMP || date +%Y%m%d%H%M%S | tee .TIMESTAMP)
   - echo "TIMESTAMP ${TIMESTAMP}"
   # Setup the CI image name we'll be using
   - export CI_IMAGE="${CI_REGISTRY_IMAGE}/builds:${CI_PIPELINE_IID}"
