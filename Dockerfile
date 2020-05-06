@@ -1,4 +1,4 @@
-FROM alpine:3.11
+FROM alpine:edge
 
 ARG VERSION_INFO
 LABEL maintainer="Nigel Kukard <nkukard@lbsd.net>"
