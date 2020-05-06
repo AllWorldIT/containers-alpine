@@ -14,46 +14,76 @@ variables:
   DOCKER_CERT_PATH: /certs/client
 
 before_script:
-  - if [ -n "$GROUP_CI_REGISTRY_USER" -a -n "$GROUP_CI_REGISTRY_PASSWORD" ]; then echo "Group CI login..."; docker login -u "$GROUP_CI_REGISTRY_USER" -p "$GROUP_CI_REGISTRY_PASSWORD" registry.gitlab.iitsp.com/allworldit/docker; fi
-  - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
+  - if [ -n "$GROUP_CI_REGISTRY_USER" -a -n "$GROUP_CI_REGISTRY_PASSWORD" ]; then
+      echo "Group CI login...";
+      echo "$GROUP_CI_REGISTRY_PASSWORD" | docker login --username "$GROUP_CI_REGISTRY_USER" -password-stdin registry.gitlab.iitsp.com/allworldit/docker;
+    fi
+  - echo "$CI_REGISTRY_PASSWORD" | docker login --username "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+  # Work out some things we may need below
+  - export TIMESTAMP=$(cat .TIMESTAMP || date +%y%m%d%H%M%S | tee .TIMESTAMP)
+  - echo "TIMESTAMP $TIMESTAMP"
+  # Setup the CI image name we'll be using
+  - export CI_IMAGE="$CI_REGISTRY_IMAGE/builds:$CI_PIPELINE_IID"
+  # If we're a branch, tag or unknown
+  - if [ -n "$CI_COMMIT_BRANCH" ]; then
+      if [ "$CI_COMMIT_BRANCH" != "master" ]; then
+        REPO_PREFIX="$CI_COMMIT_BRANCH:";
+      else
+        REPO_PREFIX="";
+      fi;
+      export CONTAINER_RELEASE_IMAGE="$CI_REGISTRY_IMAGE/${REPO_PREFIX}latest";
+      export CONTAINER_IMAGE="$CI_REGISTRY_IMAGE/${REPO_PREFIX}$TIMESTAMP";
+      export VER=" timestamp $TIMESTAMP";
+    elif [ -n "$CI_COMMIT_TAG" ]; then
+      export IMAGE_TAG_REL=$(echo "$CI_COMMIT_TAG" | sed -e 's/^v//');
+      export IMAGE_TAG=$(echo "$IMAGE_TAG_REL" | sed -E -e 's/-[0-9][0-9\.]*$//');
+      if [ "$IMAGE_TAG_REL" == "$IMAGE_TAG" ]; then
+        echo "ERROR - Tag is in the wrong format. It should be 'vX.Y.Z-A.B'";
+        exit 1;
+      fi;
+      export CONTAINER_RELEASE_IMAGE="$CI_REGISTRY_IMAGE:$IMAGE_TAG";
+      export VER=" $CI_COMMIT_TAG";
+    else
+      echo "ERROR determining type of image";
+      exit 1;
+    fi
+
 
 build:
   stage: build
   script:
-    - set
-    - if [ -n "$CI_BUILD_TAG" ]; then export CONTAINER_TEST_IMAGE="$CI_REGISTRY_IMAGE:$CI_BUILD_TAG"; VER=" $CI_BUILD_TAG"; else export CONTAINER_TEST_IMAGE="$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"; VER=""; fi
-    - docker build --pull --build-arg=VERSION_INFO="$CI_PROJECT_TITLE [$CI_PROJECT_PATH_SLUG]$VER build $CI_BUILD_ID commit $CI_COMMIT_SHORT_SHA ($(date -Iseconds))" --tag "$CONTAINER_TEST_IMAGE" .
+    - docker build --pull
+          --build-arg=VERSION_INFO="$CI_PROJECT_TITLE [$CI_PROJECT_PATH_SLUG]$VER build $CI_PIPELINE_IID commit $CI_COMMIT_SHORT_SHA ($(date -Iseconds))"
+          --tag "$CI_IMAGE" .
     # Branch tags are required for CI
-    - docker push "$CONTAINER_TEST_IMAGE"
+    - docker push "$CI_IMAGE"
+  artifacts:
+    paths:
+      - .TIMESTAMP
+
 
 test:
   stage: test
   script:
-    - if [ -n "$CI_BUILD_TAG" ]; then export CONTAINER_TEST_IMAGE="$CI_REGISTRY_IMAGE:$CI_BUILD_TAG"; else export CONTAINER_TEST_IMAGE="$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"; fi
-    - docker pull "$CONTAINER_TEST_IMAGE"
-    - docker run -e CI=true "$CONTAINER_TEST_IMAGE"
+    - docker pull "$CI_IMAGE"
+    - docker run -e CI=true "$CI_IMAGE"
+  artifacts:
+    paths:
+      - .TIMESTAMP
 
-# Dated releases are only done for master
-release-timestamp:
+
+release:
   stage: release
   script:
-    - if [ -n "$CI_BUILD_TAG" ]; then export CONTAINER_TEST_IMAGE="$CI_REGISTRY_IMAGE:$CI_BUILD_TAG"; else export CONTAINER_TEST_IMAGE="$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"; fi
-    - export CONTAINER_DATED_IMAGE="$CI_REGISTRY_IMAGE:$(date +%Y%m%d)"
-    - docker pull "$CONTAINER_TEST_IMAGE"
-    - docker tag "$CONTAINER_TEST_IMAGE" "$CONTAINER_DATED_IMAGE"
-    - docker push "$CONTAINER_DATED_IMAGE"
-  only:
-    - master
-
-# Releases are only done for the master repository, which maps to "latest"
-release-latest:
-  stage: release
-  script:
-    - if [ -n "$CI_BUILD_TAG" ]; then export CONTAINER_TEST_IMAGE="$CI_REGISTRY_IMAGE:$CI_BUILD_TAG"; else export CONTAINER_TEST_IMAGE="$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"; fi
-    - export CONTAINER_RELEASE_IMAGE="$CI_REGISTRY_IMAGE:latest"
-    - docker pull "$CONTAINER_TEST_IMAGE"
-    - docker tag "$CONTAINER_TEST_IMAGE" "$CONTAINER_RELEASE_IMAGE"
-    - docker push "$CONTAINER_RELEASE_IMAGE"
-  only:
-    - tags
+    # Grab CI image
+    - docker pull "$CI_IMAGE"
+    # Work out what we're pushing
+    - if [ -n "$CONTAINER_IMAGE" ]; then
+        docker tag "$CI_IMAGE" "$CONTAINER_IMAGE";
+        docker push "$CONTAINER_IMAGE";
+      fi
+    - if [ -n "$CONTAINER_RELEASE_IMAGE" ]; then
+        docker tag "$CI_IMAGE" "$CONTAINER_RELEASE_IMAGE";
+        docker push "$CONTAINER_RELEASE_IMAGE";
+      fi
 
