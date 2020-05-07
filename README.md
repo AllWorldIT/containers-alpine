@@ -1,6 +1,6 @@
 # Introduction
 
-This is the AllWorldIT base image for various other docker images.
+This is the AllWorldIT Alpine Linux base image for various other docker images.
 
 It comes bundled with Supervisord, Postfix and Cron.
 
