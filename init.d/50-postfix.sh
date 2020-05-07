@@ -4,7 +4,7 @@ set -e
 
 # Check if we need to enable postfix
 if [ -z "$START_POSTFIX" ]; then
-	exit 0
+	return
 fi
 
 # Sanity checks
