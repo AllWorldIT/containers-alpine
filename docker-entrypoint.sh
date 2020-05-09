@@ -64,12 +64,14 @@ if [ "$CI" == "true" ]; then
 	sleep 5
 	# Execute any pre-exec scripts
 	echo "INFO: Running tests..."
-	while read i
+	while read test
 	do
-		echo "INFO: Running tests... $i"
-		if [ -e "${i}" ]; then
-			echo "INFO: tests.d - Processing [$i]"
-			. "${i}"
+		echo "INFO: Running tests... $test"
+		if [ -e "${test}" ]; then
+			echo "INFO: tests.d - Processing [$test]"
+			set -x
+			. "${test}"
+			set +x
 		fi
 	done < <(find /docker-entrypoint-tests.d -type f -name '*.sh' | sort)
 else
