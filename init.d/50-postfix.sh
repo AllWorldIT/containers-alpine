@@ -1,7 +1,5 @@
 #!/bin/sh
 
-set -e
-
 # Check if we need to enable postfix
 if [ -z "$START_POSTFIX" ]; then
 	return

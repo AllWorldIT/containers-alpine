@@ -1,7 +1,5 @@
 #!/bin/sh
 
-set -e
-
 export START_POSTFIX=yes
 export POSTFIX_ROOT_ADDRESS=root@localhost
 export POSTFIX_MYHOSTNAME=localhost
