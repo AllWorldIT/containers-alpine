@@ -14,6 +14,8 @@ RUN set -ex; \
 	if [ -n "$VERSION_INFO" ]; then echo "$VERSION_INFO" >> /.VERSION_INFO; fi; \
 	true "Cleanup"; \
 	rm -f /var/cache/apk/*; \
+	true "Cron"; \
+	mkdir -p /etc/periodic/5min; \
 	true "Scriptlets"; \
 	mkdir /docker-entrypoint-pre-init-tests.d; \
 	mkdir /docker-entrypoint-pre-init.d; \
@@ -37,6 +39,7 @@ RUN set -ex; \
 
 # Crond
 COPY etc/supervisor/conf.d/crond.conf /etc/supervisor/conf.d/crond.conf
+COPY etc/crontabs/root /etc/crontabs/root
 COPY tests.d/50-crond.sh /docker-entrypoint-tests.d/50-crond.sh
 RUN set -ex; \
 		chown root:root \
