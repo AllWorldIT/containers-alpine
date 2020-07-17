@@ -1,6 +1,6 @@
 FROM alpine:edge
 
-ARG VERSION_INFO
+ARG VERSION_INFO=
 LABEL maintainer="Nigel Kukard <nkukard@lbsd.net>"
 
 RUN set -ex; \
