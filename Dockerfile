@@ -7,6 +7,7 @@ RUN set -ex; \
 	true "Bash"; \
 	apk add --no-cache bash; \
 	true "Supervisord"; \
+	apk add --no-cache py3-setuptools; \
 	apk add --no-cache supervisor; \
 	true "Postfix"; \
 	apk add --no-cache postfix; \
