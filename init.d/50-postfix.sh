@@ -66,7 +66,7 @@ echo "mailbox_size_limit = 0" >> /etc/postfix/main.cf
 
 echo "enable_long_queue_ids = yes" >> /etc/postfix/main.cf
 
-echo "address_verify_map = hash:/var/lib/postfix/verify" >> /etc/postfix/main.cf
+echo "address_verify_map = lmdb:/var/lib/postfix/verify" >> /etc/postfix/main.cf
 echo "address_verify_negative_refresh_time = 5m" >> /etc/postfix/main.cf
 echo "unverified_recipient_reject_code = 550" >> /etc/postfix/main.cf
 echo "unverified_sender_reject_code = 550" >> /etc/postfix/main.cf
@@ -79,7 +79,7 @@ echo "smtpd_sender_restrictions = reject_non_fqdn_sender, reject_unknown_sender_
 echo "smtpd_data_restrictions = reject_multi_recipient_bounce, reject_unauth_pipelining" >> /etc/postfix/main.cf
 
 echo "relay_domains = /etc/postfix/relay_domains" >> /etc/postfix/main.cf
-echo "transport_maps = hash:/etc/postfix/transport_maps" >> /etc/postfix/main.cf
+echo "transport_maps = lmdb:/etc/postfix/transport_maps" >> /etc/postfix/main.cf
 echo "### END DOCKER CONFIG ###" >> /etc/postfix/main.cf
 
 # Master
