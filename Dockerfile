@@ -45,6 +45,7 @@ RUN set -ex; \
 			/etc/supervisor/conf.d/crond.conf \
 			/docker-entrypoint-tests.d/50-crond.sh; \
 		chmod 0644 \
+			/etc/crontabs/root \
 			/etc/supervisor/conf.d/crond.conf; \
 		chmod 0755 \
 			/docker-entrypoint-tests.d/50-crond.sh
