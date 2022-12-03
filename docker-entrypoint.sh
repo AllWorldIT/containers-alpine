@@ -52,7 +52,7 @@ do
 done < <(find /docker-entrypoint-pre-exec.d -type f -name '*.sh' | sort)
 
 
-if [ "$CI" == "true" ]; then
+if [ -n "$CI" ]; then
 	echo "INFO: Running in TEST mode"
 	/usr/bin/env -i /usr/bin/supervisord --nodaemon --config /etc/supervisor/supervisord.conf &
 	SUPERVISORD_PID=$!
