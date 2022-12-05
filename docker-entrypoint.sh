@@ -10,7 +10,7 @@ if [ -e /.VERSION_INFO ]; then
 	echo "------------------------------"
 fi
 
-if [ "$CI" == "true" ]; then
+if [ -n "$CI" ]; then
 	# Execute any pre-init-tests scripts
 	while read i
 	do
