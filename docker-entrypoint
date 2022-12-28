@@ -10,6 +10,15 @@ if [ -e /.VERSION_INFO ]; then
 	echo "------------------------------"
 fi
 
+
+# Check for normal entrypoint being disabled
+if [ -n "$DISABLE_ENTRYPOINT" ]; then
+	echo "NOTICE: Disabling entrypoint"
+	# Run custom command
+	"$@"
+fi
+
+
 if [ -n "$CI" ]; then
 	# Execute any pre-init-tests scripts
 	while read i

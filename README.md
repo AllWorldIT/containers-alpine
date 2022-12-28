@@ -9,10 +9,14 @@ It comes bundled with Supervisord and Cron.
 # Environment
 
 
+## DISABLE_ENTRYPOINT
+
+Setting this environment variable will disable the normal entrypoint if used with a CMD override.
+
+
 ## DISABLE_SUPERVISORD
 
-If set, this environment variable will disable supervisord when overriding the run command only.
-
+If set, this environment variable will disable supervisord when used with a CMD override.
 
 
 
@@ -41,7 +45,7 @@ Any file with the .sh extension in this directory will be sourced in after initi
 
 ## Directory: /docker-entrypoint-tests.d
 
-Any file with the .sh extension in this directory will be sourced in during tests only.
+Any file with the .sh extension in this directory will be sourced in during tests only, after startup.
 
 
 ## Directory: /docker-healthcheck.d
