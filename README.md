@@ -44,3 +44,6 @@ Any file with the .sh extension in this directory will be sourced in after initi
 Any file with the .sh extension in this directory will be sourced in during tests only.
 
 
+## Directory: /docker-healthcheck.d
+
+Any file with the .sh extension in this directory will be sourced in during healthcheck.

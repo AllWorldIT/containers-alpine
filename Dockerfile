@@ -21,11 +21,13 @@ RUN set -ex; \
 	mkdir /docker-entrypoint-init.d; \
 	mkdir /docker-entrypoint-pre-exec.d; \
 	mkdir /docker-entrypoint-tests.d; \
+	mkdir /docker-healthcheck.d; \
 	chmod 750 /docker-entrypoint-pre-init-tests.d; \
 	chmod 750 /docker-entrypoint-pre-init.d; \
 	chmod 750 /docker-entrypoint-init.d; \
 	chmod 750 /docker-entrypoint-pre-exec.d; \
-	chmod 750 /docker-entrypoint-tests.d
+	chmod 750 /docker-entrypoint-tests.d; \
+	chmod 750 /docker-healthcheck.d
 
 
 # Supervisord
@@ -51,11 +53,16 @@ RUN set -ex; \
 			/docker-entrypoint-tests.d/50-crond.sh
 
 # Entrypoint
-COPY docker-entrypoint.sh /usr/local/sbin/
+COPY docker-entrypoint /usr/local/sbin/
+COPY docker-healthcheck /usr/local/sbin/
 RUN set -ex; \
 		chown root:root \
-			/usr/local/sbin/docker-entrypoint.sh; \
+			/usr/local/sbin/docker-entrypoint \
+			/usr/local/sbin/docker-healthcheck; \
 		chmod 0755 \
-			/usr/local/sbin/docker-entrypoint.sh
+			/usr/local/sbin/docker-entrypoint \
+			/usr/local/sbin/docker-healthcheck
 
-ENTRYPOINT ["docker-entrypoint.sh"]
+ENTRYPOINT ["docker-entrypoint"]
+
+HEALTHCHECK CMD docker-healthcheck

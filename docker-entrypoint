@@ -15,7 +15,7 @@ if [ -n "$CI" ]; then
 	while read i
 	do
 		if [ -e "${i}" ]; then
-			echo "INFO: pre-init-tests.d - Processing [$i]"
+			echo "INFO: docker-entrypoint-pre-init-tests.d - Processing [$i]"
 			. "${i}"
 		fi
 	done < <(find /docker-entrypoint-pre-init-tests.d -type f -name '*.sh' | sort)
@@ -26,7 +26,7 @@ fi
 while read i
 do
 	if [ -e "${i}" ]; then
-		echo "INFO: pre-init.d - Processing [$i]"
+		echo "INFO: docker-entrypoint-pre-init.d - Processing [$i]"
 		. "${i}"
 	fi
 done < <(find /docker-entrypoint-pre-init.d -type f -name '*.sh' | sort)
@@ -36,7 +36,7 @@ done < <(find /docker-entrypoint-pre-init.d -type f -name '*.sh' | sort)
 while read i
 do
 	if [ -e "${i}" ]; then
-		echo "INFO: init.d - Processing [$i]"
+		echo "INFO: docker-entrypoint-init.d - Processing [$i]"
 		. "${i}"
 	fi
 done < <(find /docker-entrypoint-init.d -type f -name '*.sh' | sort)
@@ -46,12 +46,13 @@ done < <(find /docker-entrypoint-init.d -type f -name '*.sh' | sort)
 while read i
 do
 	if [ -e "${i}" ]; then
-		echo "INFO: pre-exec.d - Processing [$i]"
+		echo "INFO: docker-entrypoint-pre-exec.d - Processing [$i]"
 		. "${i}"
 	fi
 done < <(find /docker-entrypoint-pre-exec.d -type f -name '*.sh' | sort)
 
 
+# Check if we're running in CI mode
 if [ -n "$CI" ]; then
 	echo "INFO: Running in TEST mode"
 	/usr/bin/env -i /usr/bin/supervisord --nodaemon --config /etc/supervisor/supervisord.conf &
@@ -68,7 +69,7 @@ if [ -n "$CI" ]; then
 	do
 		echo "INFO: Running tests... $test"
 		if [ -e "${test}" ]; then
-			echo "INFO: tests.d - Processing [$test]"
+			echo "INFO: docker-entrypoint-tests.d - Processing [$test]"
 			set -x
 			. "${test}"
 			set +x
@@ -94,4 +95,3 @@ else
 	echo "INFO: Ready for start up"
 	exec /usr/bin/env -i /usr/bin/supervisord --nodaemon --config /etc/supervisor/supervisord.conf
 fi
-
