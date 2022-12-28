@@ -5,7 +5,15 @@ This is the AllWorldIT Alpine Linux base image for various other docker images.
 It comes bundled with Supervisord and Cron.
 
 
+
 # Environment
+
+
+## DISABLE_SUPERVISORD
+
+If set, this environment variable will disable supervisord when overriding the run command only.
+
+
 
 
 # Script directories

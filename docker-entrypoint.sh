@@ -81,11 +81,14 @@ fi
 
 if [ $# -gt 0 ]; then
 	echo "INFO: Ready for start up with manual command"
-	echo "INFO: Logging enabled"
-	/usr/bin/env -i /usr/bin/supervisord --config /etc/supervisor/supervisord.conf \
-			--logfile /var/log/supervisord.log \
-			--logfile_maxbytes=1000000 \
-			--logfile_backups=8
+	# Check if we're disabling supervisord
+	if [ -z "$DISABLE_SUPERVISORD" ]; then
+		/usr/bin/env -i /usr/bin/supervisord --config /etc/supervisor/supervisord.conf \
+				--logfile /var/log/supervisord.log \
+				--logfile_maxbytes=1000000 \
+				--logfile_backups=8
+	fi
+	# Run custom command
 	"$@"
 else
 	echo "INFO: Ready for start up"
