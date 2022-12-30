@@ -42,18 +42,18 @@ RUN set -ex; \
 COPY etc/supervisor/conf.d/crond.conf /etc/supervisor/conf.d/crond.conf
 COPY etc/crontabs/root /etc/crontabs/root
 COPY tests.d/50-crond.sh /docker-entrypoint-tests.d/50-crond.sh
-COPY tests.d/99-healthcheck.sh /docker-entrypoint-tests.d/99-healthcheck.sh
+COPY tests.d/10-healthcheck.sh /docker-entrypoint-tests.d/10-healthcheck.sh
 RUN set -ex; \
 		chown root:root \
 			/etc/supervisor/conf.d/crond.conf \
 			/docker-entrypoint-tests.d/50-crond.sh \
-			/docker-entrypoint-tests.d/99-healthcheck.sh; \
+			/docker-entrypoint-tests.d/10-healthcheck.sh; \
 		chmod 0644 \
 			/etc/crontabs/root \
 			/etc/supervisor/conf.d/crond.conf; \
 		chmod 0755 \
 			/docker-entrypoint-tests.d/50-crond.sh \
-			/docker-entrypoint-tests.d/99-healthcheck.sh
+			/docker-entrypoint-tests.d/10-healthcheck.sh
 
 # Entrypoint
 COPY docker-entrypoint /usr/local/sbin/
