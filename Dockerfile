@@ -24,7 +24,7 @@ RUN set -ex; \
 	mkdir /docker-entrypoint-init.d; \
 	mkdir /docker-entrypoint-pre-exec.d; \
 	mkdir /docker-entrypoint-tests.d; \
-	mkdir /docker-healthcheck.d; \
+	mkdir /docker-healthcheck.d
 
 
 # Supervisord
