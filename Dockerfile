@@ -1,7 +1,10 @@
 FROM alpine:edge
 
 ARG VERSION_INFO=
-LABEL maintainer="Nigel Kukard <nkukard@lbsd.net>"
+LABEL org.opencontainers.image.authors   = "Nigel Kukard <nkukard@conarx.tech>"
+LABEL org.opencontainers.image.version   = "edge"
+LABEL org.opencontainers.image.base.name = "docker.io/library/alpine:edge"
+
 
 RUN set -ex; \
 	true "Bash"; \
@@ -22,12 +25,6 @@ RUN set -ex; \
 	mkdir /docker-entrypoint-pre-exec.d; \
 	mkdir /docker-entrypoint-tests.d; \
 	mkdir /docker-healthcheck.d; \
-	chmod 750 /docker-entrypoint-pre-init-tests.d; \
-	chmod 750 /docker-entrypoint-pre-init.d; \
-	chmod 750 /docker-entrypoint-init.d; \
-	chmod 750 /docker-entrypoint-pre-exec.d; \
-	chmod 750 /docker-entrypoint-tests.d; \
-	chmod 750 /docker-healthcheck.d
 
 
 # Supervisord
@@ -37,6 +34,7 @@ RUN set -ex; \
 			/etc/supervisor/supervisord.conf; \
 		chmod 0644 \
 			/etc/supervisor/supervisord.conf
+
 
 # Crond
 COPY etc/supervisor/conf.d/crond.conf /etc/supervisor/conf.d/crond.conf
@@ -51,17 +49,25 @@ RUN set -ex; \
 		chmod 0644 \
 			/etc/crontabs/root \
 			/etc/supervisor/conf.d/crond.conf; \
+
 		chmod 0755 \
 			/docker-entrypoint-tests.d/50-crond.sh \
 			/docker-entrypoint-tests.d/99-healthcheck.sh
 
-# Entrypoint
+# Entrypoint & health checks
 COPY docker-entrypoint /usr/local/sbin/
 COPY docker-healthcheck /usr/local/sbin/
 RUN set -ex; \
 		chown root:root \
 			/usr/local/sbin/docker-entrypoint \
 			/usr/local/sbin/docker-healthcheck; \
+		chmod 750 \
+			/docker-entrypoint-pre-init-tests.d \
+			/docker-entrypoint-pre-init.d \
+			/docker-entrypoint-init.d \
+			/docker-entrypoint-pre-exec.d \
+			/docker-entrypoint-tests.d \
+			/docker-healthcheck.d; \
 		chmod 0755 \
 			/usr/local/sbin/docker-entrypoint \
 			/usr/local/sbin/docker-healthcheck

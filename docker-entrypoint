@@ -1,13 +1,12 @@
 #!/bin/bash
-#NK: We need bash for the redirects below
-
 
 set -e
 
+
 if [ -e /.VERSION_INFO ]; then
-	echo ">>>> Docker Image Version <<<<"
+	echo ">>>> Container Version Information <<<<"
 	cat /.VERSION_INFO
-	echo "------------------------------"
+	echo "---------------------------------------"
 fi
 
 

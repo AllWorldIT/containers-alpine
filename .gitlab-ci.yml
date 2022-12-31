@@ -1,5 +1,5 @@
 include:
-  - project: 'allworldit/docker/gitlab-ci-template'
+  - project: 'gitlab/templates/containers'
     ref: master
     file: '/default.yml'
 
