@@ -1,9 +1,30 @@
-FROM alpine:edge
+# Copyright (c) 2022-2023, AllWorldIT.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to
+# deal in the Software without restriction, including without limitation the
+# rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+# sell copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+# IN THE SOFTWARE.
+
+
+FROM alpine:3.17
 
 ARG VERSION_INFO=
 LABEL org.opencontainers.image.authors   = "Nigel Kukard <nkukard@conarx.tech>"
-LABEL org.opencontainers.image.version   = "edge"
-LABEL org.opencontainers.image.base.name = "docker.io/library/alpine:edge"
+LABEL org.opencontainers.image.version   = "3.17"
+LABEL org.opencontainers.image.base.name = "docker.io/library/alpine:3.17"
 
 
 RUN set -ex; \
@@ -12,23 +33,29 @@ RUN set -ex; \
 	true "Supervisord"; \
 	apk add --no-cache py3-setuptools; \
 	apk add --no-cache supervisor; \
+	true "Syslog-ng"; \
+	apk add --no-cache syslog-ng; \
+	true "Cron"; \
+	rm -rfv \
+		/etc/crontabs/* \
+		/etc/periodic; \
+	apk add --no-cache cronie; \
+	true "Flexible Docker Containers"; \
 	true "Versioning"; \
 	if [ -n "$VERSION_INFO" ]; then echo "$VERSION_INFO" >> /.VERSION_INFO; fi; \
 	true "Cleanup"; \
 	rm -f /var/cache/apk/*; \
-	true "Cron"; \
-	mkdir -p /etc/periodic/5min; \
-	true "Scriptlets"; \
-	mkdir /docker-entrypoint-pre-init-tests.d; \
-	mkdir /docker-entrypoint-pre-init.d; \
-	mkdir /docker-entrypoint-init.d; \
-	mkdir /docker-entrypoint-pre-exec.d; \
-	mkdir /docker-entrypoint-tests.d; \
-	mkdir /docker-healthcheck.d
+	mkdir -p \
+		/usr/local/share/flexible-docker-containers/pre-init-tests.d \
+		/usr/local/share/flexible-docker-containers/pre-init.d \
+		/usr/local/share/flexible-docker-containers/init.d \
+		/usr/local/share/flexible-docker-containers/pre-exec.d \
+		/usr/local/share/flexible-docker-containers/tests.d \
+		/usr/local/share/flexible-docker-containers/healthcheck.d
 
 
 # Supervisord
-COPY etc/supervisor/supervisord.conf /etc/supervisor/supervisord.conf
+COPY etc/supervisor/supervisord.conf /etc/supervisor/
 RUN set -ex; \
 		chown root:root \
 			/etc/supervisor/supervisord.conf; \
@@ -36,42 +63,43 @@ RUN set -ex; \
 			/etc/supervisor/supervisord.conf
 
 
+# Syslog-ng (for logging of syslog to stdout/stderr to docker)
+COPY etc/syslog-ng/syslog-ng.conf /etc/syslog-ng/syslog-ng.conf
+COPY etc/supervisor/conf.d/syslog-ng.conf /etc/supervisor/conf.d/syslog-ng.conf
+RUN set -ex; \
+	chown root:root \
+		/etc/syslog-ng/syslog-ng.conf \
+		/etc/supervisor/conf.d/syslog-ng.conf; \
+	chmod 0644 \
+		/etc/syslog-ng/syslog-ng.conf \
+		/etc/supervisor/conf.d/syslog-ng.conf
+
+
 # Crond
-COPY etc/supervisor/conf.d/crond.conf /etc/supervisor/conf.d/crond.conf
-COPY etc/crontabs/root /etc/crontabs/root
-COPY tests.d/50-crond.sh /docker-entrypoint-tests.d/50-crond.sh
-COPY tests.d/99-healthcheck.sh /docker-entrypoint-tests.d/99-healthcheck.sh
+COPY etc/supervisor/conf.d/crond.conf.disabled /etc/supervisor/conf.d/
+COPY usr/local/share/flexible-docker-containers/tests.d/40-crond.sh /usr/local/share/flexible-docker-containers/tests.d
+COPY usr/local/share/flexible-docker-containers/pre-init-tests.d/40-crond.sh /usr/local/share/flexible-docker-containers/pre-init-tests.d
+COPY usr/local/share/flexible-docker-containers/pre-init.d/40-crond.sh /usr/local/share/flexible-docker-containers/pre-init.d
 RUN set -ex; \
 		chown root:root \
-			/etc/supervisor/conf.d/crond.conf \
-			/docker-entrypoint-tests.d/50-crond.sh \
-			/docker-entrypoint-tests.d/99-healthcheck.sh; \
+			/etc/supervisor/conf.d/crond.conf.disabled; \
 		chmod 0644 \
-			/etc/crontabs/root \
-			/etc/supervisor/conf.d/crond.conf; \
+			/etc/supervisor/conf.d/crond.conf.disabled
 
-		chmod 0755 \
-			/docker-entrypoint-tests.d/50-crond.sh \
-			/docker-entrypoint-tests.d/99-healthcheck.sh
 
-# Entrypoint & health checks
-COPY docker-entrypoint /usr/local/sbin/
-COPY docker-healthcheck /usr/local/sbin/
+# Install Flexible Docker Containers
+COPY usr/local/sbin/fdc /usr/local/sbin/
+COPY usr/local/share/flexible-docker-containers/tests.d/99-healthcheck.sh /usr/local/share/flexible-docker-containers/tests.d
 RUN set -ex; \
 		chown root:root \
-			/usr/local/sbin/docker-entrypoint \
-			/usr/local/sbin/docker-healthcheck; \
-		chmod 750 \
-			/docker-entrypoint-pre-init-tests.d \
-			/docker-entrypoint-pre-init.d \
-			/docker-entrypoint-init.d \
-			/docker-entrypoint-pre-exec.d \
-			/docker-entrypoint-tests.d \
-			/docker-healthcheck.d; \
+			/usr/local/sbin/fdc \
+			/usr/local/share/flexible-docker-containers/*; \
 		chmod 0755 \
-			/usr/local/sbin/docker-entrypoint \
-			/usr/local/sbin/docker-healthcheck
+			/usr/local/sbin/fdc \
+			/usr/local/share/flexible-docker-containers/*; \
+		fdc set-perms
 
-ENTRYPOINT ["docker-entrypoint"]
 
-HEALTHCHECK CMD docker-healthcheck
+ENTRYPOINT ["fdc", "start"]
+
+HEALTHCHECK CMD fdc healthcheck

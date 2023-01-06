@@ -1,0 +1,181 @@
+#!/bin/bash
+# Copyright (c) 2022-2023, AllWorldIT.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to
+# deal in the Software without restriction, including without limitation the
+# rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+# sell copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+# IN THE SOFTWARE.
+
+
+VERSION=0.0.1
+
+
+# Function to source in files from our .d directories
+function dot_d_files() {
+	dot_d_dir="$1.d"
+
+	# Make sure we start off in the right place
+	cd "/usr/local/share/flexible-docker-containers"
+
+    # Make sure the directory exists
+	if [ ! -d "$dot_d_dir" ]; then
+		echo "ERROR: Cannot find '$dot_d_dir'"
+		exit 1
+	fi
+
+    cd "$dot_d_dir"
+	while read _f; do
+		# Ensure we source the file from the correct place if a script changes us to somewhere else
+		cd "/usr/local/share/flexible-docker-containers/$dot_d_dir"
+		echo "INFO: $dot_d_dir - Processing [$_f]"
+		. "$_f"
+	done < <(find . -type f -name '*.sh' | cut -d/ -f2- | sort -n)
+}
+
+# Show version info
+function show_version_info() {
+    if [ -e /.VERSION_INFO ]; then
+        echo ">>>> Flexible Docker Container Version Information <<<<"
+        cat /.VERSION_INFO
+        echo "-------------------------------------------------------"
+    fi
+}
+
+
+# Startup container
+function fdc_start() {
+    set -e
+
+    show_version_info
+
+    # Check if we're setting up debugging
+    if [ -n "$FDC_DEBUG" ]; then
+        set -x
+    fi
+
+    # Check for normal entrypoint being disabled
+    if [ -n "$FDC_DISABLE_ENTRYPOINT" ]; then
+        echo "NOTICE: Disabling entrypoint"
+        # Run custom command
+        cd /root
+        exec "$@"
+    fi
+
+    # If we're running in CI mode, check if we have pre-init-tests.d to run
+    if [ -n "$FDC_CI" ]; then
+        # Execute any pre-init-tests.d scripts
+        dot_d_files pre-init-tests
+    fi
+
+    # Execute any pre-init.d scripts
+    dot_d_files pre-init
+
+    # Execute any init.d scripts
+    dot_d_files init
+
+    # Execute any pre-exec.d scripts
+    dot_d_files pre-exec
+
+    # Check if we're running in CI mode
+    if [ -n "$FDC_CI" ]; then
+        echo "INFO: Running in TEST mode"
+        /usr/bin/env -i /usr/bin/supervisord --nodaemon --config /etc/supervisor/supervisord.conf &
+        SUPERVISORD_PID=$!
+        trap "
+            echo 'Exit Code: $?';
+            echo 'Cleanup: supervisord';
+            kill $SUPERVISORD_PID;
+        " EXIT
+        echo "INFO: Waiting 5s before running tests"
+        sleep 5
+        # Execute any tests.d scripts
+        echo "INFO: Running tests..."
+        dot_d_files tests
+
+        exit 0
+    fi
+
+    # If we have commandline arguments, we need to background supervisord and run the command provided
+    if [ $# -gt 0 ]; then
+        echo "INFO: Ready for start up with manual command"
+        # Check if we're disabling supervisord
+        if [ -z "$FDC_DISABLE_SUPERVISORD" ]; then
+            /usr/bin/env -i /usr/bin/supervisord --config /etc/supervisor/supervisord.conf \
+                    --logfile /var/log/supervisord.log \
+                    --logfile_maxbytes=1000000 \
+                    --logfile_backups=8
+        fi
+        # Run custom command
+        cd /root
+        exec "$@"
+    else
+        echo "INFO: Ready for start up"
+        exec /usr/bin/env -i /usr/bin/supervisord --nodaemon --config /etc/supervisor/supervisord.conf
+    fi
+}
+
+
+# Do healthcheck
+function fdc_healthcheck() {
+    set -e
+    dot_d_files healthcheck
+}
+
+
+# Do healthcheck
+function fdc_setperms() {
+    find /usr/local/share/flexible-docker-containers -type d -name "*.d" -print0 | xargs -0 chmod 0755
+    find /usr/local/share/flexible-docker-containers -type d -name "*.d" -print0 | xargs -0 chown root:root
+    find /usr/local/share/flexible-docker-containers -type f -name "*.sh" -print0 | xargs -0 chmod 0755
+    find /usr/local/share/flexible-docker-containers -type f -name "*.sh" -print0 | xargs -0 chown root:root
+}
+
+
+# Display usage error
+function usage_error() {
+    echo "USAGE ERROR: $0 <start|healthcheck|set-perms|delay>"
+    exit 1
+}
+
+
+
+if [ "$1" == "start" ]; then
+    echo "Flexible Docker Containers v$VERSION - Copyright (c) 2023, AllWorldIT"
+    shift
+    fdc_start "$@"
+
+elif [ "$1" == "healthcheck" ]; then
+    fdc_healthcheck
+
+elif [ "$1" == "set-perms" ]; then
+    fdc_setperms
+
+elif [ "$1" == "delay" ]; then
+    # Remove command name
+    shift
+    # Check if we have a delay and sleep
+    if [ -z "$1" ]; then
+        echo "USAGE ERROR: $0 delay <time> ..."
+        exit 1
+    fi
+    sleep "$1"
+    # Remove delay and exec command
+    shift
+    exec "$@"
+
+else
+    usage_error
+fi
