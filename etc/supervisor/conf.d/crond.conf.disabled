@@ -1,0 +1,12 @@
+[program:crond]
+command=/usr/local/sbin/fdc delay 10s /usr/sbin/crond -n -P -s
+
+PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin
+
+priority=12
+
+stderr_logfile=/dev/stderr
+stderr_logfile_maxbytes=0
+
+stdout_logfile=/dev/stdout
+stdout_logfile_maxbytes=0
