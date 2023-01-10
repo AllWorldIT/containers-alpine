@@ -19,12 +19,12 @@
 # IN THE SOFTWARE.
 
 
-FROM alpine:3.17
+FROM alpine:edge
 
 ARG VERSION_INFO=
 LABEL org.opencontainers.image.authors   = "Nigel Kukard <nkukard@conarx.tech>"
-LABEL org.opencontainers.image.version   = "3.17"
-LABEL org.opencontainers.image.base.name = "docker.io/library/alpine:3.17"
+LABEL org.opencontainers.image.version   = "edge"
+LABEL org.opencontainers.image.base.name = "docker.io/library/alpine:edge"
 
 
 RUN set -ex; \
