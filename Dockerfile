@@ -65,11 +65,9 @@ COPY etc/syslog-ng/syslog-ng.conf /etc/syslog-ng/syslog-ng.conf
 COPY etc/supervisor/conf.d/syslog-ng.conf /etc/supervisor/conf.d/syslog-ng.conf
 RUN set -ex; \
 	chown root:root \
-		/etc/syslog-ng/syslog-ng.conf \
-		/etc/supervisor/conf.d/syslog-ng.conf; \
+		/etc/syslog-ng/syslog-ng.conf; \
 	chmod 0644 \
-		/etc/syslog-ng/syslog-ng.conf \
-		/etc/supervisor/conf.d/syslog-ng.conf
+		/etc/syslog-ng/syslog-ng.conf
 
 
 # Crond
@@ -77,11 +75,6 @@ COPY etc/supervisor/conf.d/crond.conf.disabled /etc/supervisor/conf.d/
 COPY usr/local/share/flexible-docker-containers/tests.d/40-crond.sh /usr/local/share/flexible-docker-containers/tests.d
 COPY usr/local/share/flexible-docker-containers/pre-init-tests.d/40-crond.sh /usr/local/share/flexible-docker-containers/pre-init-tests.d
 COPY usr/local/share/flexible-docker-containers/pre-init.d/40-crond.sh /usr/local/share/flexible-docker-containers/pre-init.d
-RUN set -ex; \
-		chown root:root \
-			/etc/supervisor/conf.d/crond.conf.disabled; \
-		chmod 0644 \
-			/etc/supervisor/conf.d/crond.conf.disabled
 
 
 # Install Flexible Docker Containers
