@@ -82,16 +82,16 @@ COPY usr/local/share/flexible-docker-containers/healthcheck.d/40-crond.sh /usr/l
 COPY usr/local/sbin/fdc /usr/local/sbin/
 COPY usr/local/share/flexible-docker-containers/tests.d/99-healthcheck.sh /usr/local/share/flexible-docker-containers/tests.d
 RUN set -ex; \
-		true "Flexible Docker Containers"; \
-		if [ -n "$VERSION_INFO" ]; then echo "$VERSION_INFO" >> /.VERSION_INFO; fi; \
-		true "Permissions"; \
-		chown root:root \
-			/usr/local/sbin/fdc \
-			/usr/local/share/flexible-docker-containers/*; \
-		chmod 0755 \
-			/usr/local/sbin/fdc \
-			/usr/local/share/flexible-docker-containers/*; \
-		fdc set-perms
+	true "Flexible Docker Containers"; \
+	if [ -n "$VERSION_INFO" ]; then echo "$VERSION_INFO" >> /.VERSION_INFO; fi; \
+	true "Permissions"; \
+	chown root:root \
+		/usr/local/sbin/fdc \
+		/usr/local/share/flexible-docker-containers/*; \
+	chmod 0755 \
+		/usr/local/sbin/fdc \
+		/usr/local/share/flexible-docker-containers/*; \
+	fdc set-perms
 
 
 ENTRYPOINT ["fdc", "start"]

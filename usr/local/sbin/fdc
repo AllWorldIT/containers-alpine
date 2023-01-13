@@ -58,14 +58,14 @@ function show_version_info() {
 
 # Startup container
 function fdc_start() {
-    set -e
-
-    show_version_info
-
     # Check if we're setting up debugging
     if [ -n "$FDC_DEBUG" ]; then
         set -x
     fi
+
+    set -e
+
+    show_version_info
 
     # Check for normal entrypoint being disabled
     if [ -n "$FDC_DISABLE_ENTRYPOINT" ]; then
