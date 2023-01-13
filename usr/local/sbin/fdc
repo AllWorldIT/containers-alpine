@@ -58,14 +58,14 @@ function show_version_info() {
 
 # Startup container
 function fdc_start() {
-    set -e
-
-    show_version_info
-
     # Check if we're setting up debugging
     if [ -n "$FDC_DEBUG" ]; then
         set -x
     fi
+
+    set -e
+
+    show_version_info
 
     # Check for normal entrypoint being disabled
     if [ -n "$FDC_DISABLE_ENTRYPOINT" ]; then
@@ -96,16 +96,18 @@ function fdc_start() {
         /usr/bin/env -i /usr/bin/supervisord --nodaemon --config /etc/supervisor/supervisord.conf &
         SUPERVISORD_PID=$!
         trap "
-            echo 'Exit Code: $?';
-            echo 'Cleanup: supervisord';
-            kill $SUPERVISORD_PID;
+            rv=\$?
+            echo \"Exit code: \$rv\"
+            echo 'Cleanup: supervisord'
+            kill $SUPERVISORD_PID
+            exit \$rv
         " EXIT
         echo "INFO: Waiting 5s before running tests"
         sleep 5
         # Execute any tests.d scripts
         echo "INFO: Running tests..."
         dot_d_files tests
-
+        # Exit after running tests, if we get this far we passed
         exit 0
     fi
 
