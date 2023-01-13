@@ -21,6 +21,7 @@
 
 
 VERSION=0.0.1
+export FDC_VERSION=$VERSION
 
 
 # Function to source in files from our .d directories
