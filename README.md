@@ -85,6 +85,17 @@ docker run -it --rm -e FDC_DISABLE_SUPERVISORD=1 $IMAGE /bin/bash
 ```
 
 
+
+# Volumes
+
+
+## /etc/cron.d
+
+Crontab files can be mounted individually within this directory to implement scheduled tasks.
+
+Note: The Cronie contab format includes a `user` field, refer to [crontab.5](https://linux.die.net/man/5/crontab) for more info.
+
+
 # Extending Using Flexible Docker Containers
 
 All scripts are processed using `source` under `set -e` which will result in any failure being propagated to prevent container
