@@ -75,6 +75,7 @@ COPY etc/supervisor/conf.d/crond.conf.disabled /etc/supervisor/conf.d/
 COPY usr/local/share/flexible-docker-containers/tests.d/40-crond.sh /usr/local/share/flexible-docker-containers/tests.d
 COPY usr/local/share/flexible-docker-containers/pre-init-tests.d/40-crond.sh /usr/local/share/flexible-docker-containers/pre-init-tests.d
 COPY usr/local/share/flexible-docker-containers/pre-init.d/40-crond.sh /usr/local/share/flexible-docker-containers/pre-init.d
+COPY usr/local/share/flexible-docker-containers/healthcheck.d/40-crond.sh /usr/local/share/flexible-docker-containers/healthcheck.d
 
 
 # Install Flexible Docker Containers
