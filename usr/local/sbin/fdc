@@ -21,6 +21,7 @@
 
 
 VERSION=0.0.1
+export FDC_VERSION=$VERSION
 
 
 # Function to source in files from our .d directories
@@ -135,12 +136,22 @@ function fdc_healthcheck() {
 }
 
 
-# Do healthcheck
+# Set perms
 function fdc_setperms() {
+    set -e
     find /usr/local/share/flexible-docker-containers -type d -name "*.d" -print0 | xargs -0 chmod 0755
     find /usr/local/share/flexible-docker-containers -type d -name "*.d" -print0 | xargs -0 chown root:root
     find /usr/local/share/flexible-docker-containers -type f -name "*.sh" -print0 | xargs -0 chmod 0755
     find /usr/local/share/flexible-docker-containers -type f -name "*.sh" -print0 | xargs -0 chown root:root
+    find \
+        /etc/cron.d \
+        /etc/supervisor/conf.d \
+        -type f -print0 | xargs -0 chmod 0644
+    find \
+        /etc/cron.d \
+        /etc/supervisor/conf.d \
+        -type f -print0 | xargs -0 chown root:root
+    set +e
 }
 
 
