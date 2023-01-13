@@ -40,9 +40,6 @@ RUN set -ex; \
 		/etc/crontabs/* \
 		/etc/periodic; \
 	apk add --no-cache cronie; \
-	true "Flexible Docker Containers"; \
-	true "Versioning"; \
-	if [ -n "$VERSION_INFO" ]; then echo "$VERSION_INFO" >> /.VERSION_INFO; fi; \
 	true "Cleanup"; \
 	rm -f /var/cache/apk/*; \
 	mkdir -p \
@@ -91,6 +88,9 @@ RUN set -ex; \
 COPY usr/local/sbin/fdc /usr/local/sbin/
 COPY usr/local/share/flexible-docker-containers/tests.d/99-healthcheck.sh /usr/local/share/flexible-docker-containers/tests.d
 RUN set -ex; \
+		true "Flexible Docker Containers"; \
+		if [ -n "$VERSION_INFO" ]; then echo "$VERSION_INFO" >> /.VERSION_INFO; fi; \
+		true "Permissions"; \
 		chown root:root \
 			/usr/local/sbin/fdc \
 			/usr/local/share/flexible-docker-containers/*; \
