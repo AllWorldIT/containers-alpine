@@ -2,8 +2,10 @@
 
 # Container Information
 
+[Container Source](https://gitlab.conarx.tech/containers/alpine) - [GitHub Mirror](https://github.com/AllWorldIT/containers-alpine)
+
 This is the Conarx Containers Alpine Linux base image, it is built specifically with re-use in mind along with flexible
-initialization, unit testing and health checks.
+initialization, unit testing and supports advanced health checks.
 
 These additional container features we call Flexible Docker Containers.
 
