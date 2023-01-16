@@ -21,7 +21,7 @@
 
 
 # Short circuit if crond is not enabled
-if ! -f /etc/supervisor/conf.d/crond.conf; then
+if [ ! -f /etc/supervisor/conf.d/crond.conf ]; then
     return
 fi
 
