@@ -80,7 +80,7 @@ COPY usr/local/share/flexible-docker-containers/healthcheck.d/40-crond.sh /usr/l
 
 # Install Flexible Docker Containers
 COPY usr/local/sbin/fdc /usr/local/sbin/
-COPY usr/local/share/flexible-docker-containers/tests.d/99-healthcheck.sh /usr/local/share/flexible-docker-containers/tests.d
+COPY usr/local/share/flexible-docker-containers/tests.d/90-healthcheck.sh /usr/local/share/flexible-docker-containers/tests.d
 RUN set -ex; \
 	true "Flexible Docker Containers"; \
 	if [ -n "$VERSION_INFO" ]; then echo "$VERSION_INFO" >> /.VERSION_INFO; fi; \
