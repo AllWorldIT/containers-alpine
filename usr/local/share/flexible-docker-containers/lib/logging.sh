@@ -53,28 +53,28 @@ function fdc_error() {
 	local color
 	color=$(fdc_color red)
 	reset=$(fdc_color reset)
-	echo "$color>>> ERROR  > $1$reset" >&2
+	echo -e "$color>>> ERROR  > $1$reset" >&2
 }
 
 function fdc_warn() {
 	local color
 	color=$(fdc_color yellow)
 	reset=$(fdc_color reset)
-	echo "$color>>> WARNING > $1$reset" >&2
+	echo -e "$color>>> WARNING > $1$reset" >&2
 }
 
 function fdc_notice() {
 	local color
 	color=$(fdc_color blue)
 	reset=$(fdc_color reset)
-	echo "$color>>> NOTICE  > $1$reset" >&2
+	echo -e "$color>>> NOTICE  > $1$reset" >&2
 }
 
 function fdc_info() {
 	local color
 	color=$(fdc_color grey)
 	reset=$(fdc_color reset)
-	echo "$color>>> INFO    > $1$reset" >&2
+	echo -e "$color>>> INFO    > $1$reset" >&2
 }
 
 
@@ -82,33 +82,33 @@ function fdc_test_start() {
 	local color
 	color=$(fdc_color blue)
 	reset=$(fdc_color reset)
-	echo "$color### TEST START    ($reset$1$color): $2$reset"
+	echo -e "$color### TEST START    ($reset$1$color): $2$reset" >&2
 }
 
 function fdc_test_progress() {
 	local color
 	color=$(fdc_color blue)
 	reset=$(fdc_color reset)
-	echo "$color### TEST PROGRESS ($reset$1$color): $2$reset"
+	echo -e "$color### TEST PROGRESS ($reset$1$color): $2$reset" >&2
 }
 
 function fdc_test_pass() {
 	local color
 	color=$(fdc_color green)
 	reset=$(fdc_color reset)
-	echo "$color### TEST PASSED   ($reset$1$color): $2$reset"
+	echo -e "$color### TEST PASSED   ($reset$1$color): $2$reset" >&2
 }
 
 function fdc_test_info() {
 	local color
 	color=$(fdc_color blue)
 	reset=$(fdc_color reset)
-	echo "$color### TEST INFO     ($reset$1$color): $2$reset"
+	echo -e "$color### TEST INFO     ($reset$1$color): $2$reset" >&2
 }
 
 function fdc_test_fail() {
 	local color
 	color=$(fdc_color red)
 	reset=$(fdc_color reset)
-	echo "$color### TEST FAILED   ($reset$1$color): $2$reset"
+	echo -e "$color### TEST FAILED   ($reset$1$color): $2$reset" >&2
 }
