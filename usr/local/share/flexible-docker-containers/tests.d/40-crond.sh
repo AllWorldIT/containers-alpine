@@ -20,31 +20,31 @@
 # IN THE SOFTWARE.
 
 
-echo "TEST START (crond): Check running..."
+fdc_test_start crond "Checking crond is running..."
 for i in {30..0}; do
 	if ! pgrep crond > /dev/null; then
 		break
 	fi
-	echo "TEST PROGRESS (crond): Waiting for crond to start... ${i}s"
+	fdc_test_progress crond "Waiting for crond to start... ${i}s"
 	sleep 1
 done
 if [ "$i" = 0 ]; then
-	echo "TEST FAILED (crond): Did not start!"
+	fdc_test_fail crond "Did not start!"
 	false
 fi
-echo "TEST PASSED (crond): Started"
+fdc_test_fail crond "Crond is running"
 
 
-echo "TEST START (crond): Check for @reboot being run"
+fdc_test_start crond "Check for @reboot being run"
 for i in {60..0}; do
 	if [ -f /PASSED_CROND ]; then
 		break
 	fi
-	echo "TEST PROGRESS (crond): Waiting for run of @reboot script... ${i}s"
+	fdc_test_progress crond "Waiting for run of @reboot script... ${i}s"
 	sleep 1
 done
 if [ "$i" = 0 ]; then
-	echo "TEST FAILED (crond): Did not run @reboot script!"
+	fdc_test_fail crond "Did not run @reboot script!"
 	false
 fi
-echo "TEST PASSED (crond): Ran @reboot script"
+fdc_test_pass crond "Ran @reboot script"

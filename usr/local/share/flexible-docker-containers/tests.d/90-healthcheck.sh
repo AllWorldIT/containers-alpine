@@ -20,10 +20,9 @@
 # IN THE SOFTWARE.
 
 
-echo "TEST START (healthcheck): Check health check works..."
+fdc_test_start healthcheck "Check health check works"
 if ! fdc healthcheck; then
-	echo "TEST FAILED (healthcheck): Did not succeed"
+	fdc_test_fail healthcheck "Did not succeed"
 	false
 fi
-
-echo "TEST PASSED (healthcheck): Ran OK"
+fdc_test_pass healthcheck "Health checks ran OK"
