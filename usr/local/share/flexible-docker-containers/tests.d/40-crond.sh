@@ -32,7 +32,7 @@ if [ "$i" = 0 ]; then
 	fdc_test_fail crond "Did not start!"
 	false
 fi
-fdc_test_fail crond "Crond is running"
+fdc_test_pass crond "Crond is running"
 
 
 fdc_test_start crond "Check for @reboot being run"
