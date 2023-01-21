@@ -22,10 +22,10 @@
 
 # Short circuit if crond is not enabled
 if [ ! -f /etc/supervisor/conf.d/crond.conf ]; then
-    return
+	return
 fi
 
 # Check crond is running
 if ! pgrep crond > /dev/null; then
-    echo "ERROR: Health check failed for crond, not running?"
+	echo "ERROR: Health check failed for crond, not running?"
 fi
