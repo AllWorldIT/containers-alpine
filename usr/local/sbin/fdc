@@ -31,13 +31,13 @@ function dot_d_files() {
 	# Make sure we start off in the right place
 	cd "/usr/local/share/flexible-docker-containers"
 
-    # Make sure the directory exists
+	# Make sure the directory exists
 	if [ ! -d "$dot_d_dir" ]; then
 		fdc_error "Cannot find '$dot_d_dir'"
 		exit 1
 	fi
 
-    cd "$dot_d_dir"
+	cd "$dot_d_dir"
 	while read -r _f; do
 		# Ensure we source the file from the correct place if a script changes us to somewhere else
 		cd "/usr/local/share/flexible-docker-containers/$dot_d_dir"
@@ -48,150 +48,150 @@ function dot_d_files() {
 
 # Show version info
 function show_version_info() {
-    if [ -e /.VERSION_INFO ]; then
-        fdc_info "Flexible Docker Container Version Information"
-        cat /.VERSION_INFO
-    fi
+	if [ -e /.VERSION_INFO ]; then
+		fdc_info "Flexible Docker Container Version Information"
+		cat /.VERSION_INFO
+	fi
 }
 
 
 # Startup container
 function fdc_start() {
-    # Check if we're setting up debugging
-    if [ -n "$FDC_DEBUG" ]; then
-        set -x
-    fi
+	# Check if we're setting up debugging
+	if [ -n "$FDC_DEBUG" ]; then
+		set -x
+	fi
 
-    set -e
+	set -e
 
-    show_version_info
+	show_version_info
 
-    # Check for normal entrypoint being disabled
-    if [ -n "$FDC_DISABLE_ENTRYPOINT" ]; then
-        fdc_notice "Disabling entrypoint"
-        # Run custom command
-        cd /root
-        exec "$@"
-    fi
+	# Check for normal entrypoint being disabled
+	if [ -n "$FDC_DISABLE_ENTRYPOINT" ]; then
+		fdc_notice "Disabling entrypoint"
+		# Run custom command
+		cd /root
+		exec "$@"
+	fi
 
-    # If we're running in CI mode, check if we have pre-init-tests.d to run
-    if [ -n "$FDC_CI" ]; then
-        # Execute any pre-init-tests.d scripts
-        dot_d_files pre-init-tests
-    fi
+	# If we're running in CI mode, check if we have pre-init-tests.d to run
+	if [ -n "$FDC_CI" ]; then
+		# Execute any pre-init-tests.d scripts
+		dot_d_files pre-init-tests
+	fi
 
-    # Execute any pre-init.d scripts
-    dot_d_files pre-init
+	# Execute any pre-init.d scripts
+	dot_d_files pre-init
 
-    # Execute any init.d scripts
-    dot_d_files init
+	# Execute any init.d scripts
+	dot_d_files init
 
-    # Execute any pre-exec.d scripts
-    dot_d_files pre-exec
+	# Execute any pre-exec.d scripts
+	dot_d_files pre-exec
 
-    # Check if we're running in CI mode
-    if [ -n "$FDC_CI" ]; then
-        fdc_notice "Running in TEST mode"
-        /usr/bin/env -i /usr/bin/supervisord --nodaemon --config /etc/supervisor/supervisord.conf &
-        SUPERVISORD_PID=$!
-        # shellcheck disable=SC2154,SC2064
-        trap "
-            rv=\$?
-            color=\$(fdc_color yellow)
-            reset=\$(fdc_color reset)
-            echo \"\${color}Exit code: \$rv\$reset\"
-            fdc_info 'Cleanup: supervisord'
-            kill $SUPERVISORD_PID
-            exit \$rv
-        " EXIT
-        fdc_info "Waiting 5s before running tests"
-        sleep 5
-        # Execute any tests.d scripts
-        fdc_info "Running tests"
-        dot_d_files tests
-        # Exit after running tests, if we get this far we passed
-        exit 0
-    fi
+	# Check if we're running in CI mode
+	if [ -n "$FDC_CI" ]; then
+		fdc_notice "Running in TEST mode"
+		/usr/bin/env -i /usr/bin/supervisord --nodaemon --config /etc/supervisor/supervisord.conf &
+		SUPERVISORD_PID=$!
+		# shellcheck disable=SC2154,SC2064
+		trap "
+			rv=\$?
+			color=\$(fdc_color yellow)
+			reset=\$(fdc_color reset)
+			echo \"\${color}Exit code: \$rv\$reset\"
+			fdc_info 'Cleanup: supervisord'
+			kill $SUPERVISORD_PID
+			exit \$rv
+		" EXIT
+		fdc_info "Waiting 5s before running tests"
+		sleep 5
+		# Execute any tests.d scripts
+		fdc_info "Running tests"
+		dot_d_files tests
+		# Exit after running tests, if we get this far we passed
+		exit 0
+	fi
 
-    # If we have commandline arguments, we need to background supervisord and run the command provided
-    if [ $# -gt 0 ]; then
-        fdc_info "Ready for start up with manual command"
-        # Check if we're disabling supervisord
-        if [ -z "$FDC_DISABLE_SUPERVISORD" ]; then
-            /usr/bin/env -i /usr/bin/supervisord --config /etc/supervisor/supervisord.conf \
-                    --logfile /var/log/supervisord.log \
-                    --logfile_maxbytes=1000000 \
-                    --logfile_backups=8
-        fi
-        # Run custom command
-        cd /root
-        exec "$@"
-    else
-        fdc_info "Ready for start up"
-        exec /usr/bin/env -i /usr/bin/supervisord --nodaemon --config /etc/supervisor/supervisord.conf
-    fi
+	# If we have commandline arguments, we need to background supervisord and run the command provided
+	if [ $# -gt 0 ]; then
+		fdc_info "Ready for start up with manual command"
+		# Check if we're disabling supervisord
+		if [ -z "$FDC_DISABLE_SUPERVISORD" ]; then
+			/usr/bin/env -i /usr/bin/supervisord --config /etc/supervisor/supervisord.conf \
+					--logfile /var/log/supervisord.log \
+					--logfile_maxbytes=1000000 \
+					--logfile_backups=8
+		fi
+		# Run custom command
+		cd /root
+		exec "$@"
+	else
+		fdc_info "Ready for start up"
+		exec /usr/bin/env -i /usr/bin/supervisord --nodaemon --config /etc/supervisor/supervisord.conf
+	fi
 }
 
 
 # Do healthcheck
 function fdc_healthcheck() {
-    set -e
-    dot_d_files healthcheck
+	set -e
+	dot_d_files healthcheck
 }
 
 
 # Set perms
 function fdc_setperms() {
-    set -e
-    find /usr/local/share/flexible-docker-containers -type d -name "*.d" -print0 | xargs -0 chmod 0755
-    find /usr/local/share/flexible-docker-containers -type d -name "*.d" -print0 | xargs -0 chown root:root
-    find /usr/local/share/flexible-docker-containers -type f -name "*.sh" -print0 | xargs -0 chmod 0755
-    find /usr/local/share/flexible-docker-containers -type f -name "*.sh" -print0 | xargs -0 chown root:root
-    find \
-        /etc/cron.d \
-        /etc/supervisor/conf.d \
-        -type f -print0 | xargs -0 chmod 0644
-    find \
-        /etc/cron.d \
-        /etc/supervisor/conf.d \
-        -type f -print0 | xargs -0 chown root:root
-    set +e
+	set -e
+	find /usr/local/share/flexible-docker-containers -type d -name "*.d" -print0 | xargs -0 chmod 0755
+	find /usr/local/share/flexible-docker-containers -type d -name "*.d" -print0 | xargs -0 chown root:root
+	find /usr/local/share/flexible-docker-containers -type f -name "*.sh" -print0 | xargs -0 chmod 0755
+	find /usr/local/share/flexible-docker-containers -type f -name "*.sh" -print0 | xargs -0 chown root:root
+	find \
+		/etc/cron.d \
+		/etc/supervisor/conf.d \
+		-type f -print0 | xargs -0 chmod 0644
+	find \
+		/etc/cron.d \
+		/etc/supervisor/conf.d \
+		-type f -print0 | xargs -0 chown root:root
+	set +e
 }
 
 
 # Display usage error
 function usage_error() {
-    fdc_error "USAGE ERROR: $0 <start|healthcheck|set-perms|delay>"
-    exit 1
+	fdc_error "USAGE ERROR: $0 <start|healthcheck|set-perms|delay>"
+	exit 1
 }
 
 
 . /usr/local/share/flexible-docker-containers/lib/logging.sh
 
 if [ "$1" == "start" ]; then
-    echo "Flexible Docker Containers v$VERSION - Copyright (c) 2023, AllWorldIT" >&2
-    shift
-    fdc_start "$@"
+	echo "Flexible Docker Containers v$VERSION - Copyright (c) 2023, AllWorldIT" >&2
+	shift
+	fdc_start "$@"
 
 elif [ "$1" == "healthcheck" ]; then
-    fdc_healthcheck
+	fdc_healthcheck
 
 elif [ "$1" == "set-perms" ]; then
-    fdc_setperms
+	fdc_setperms
 
 elif [ "$1" == "delay" ]; then
-    # Remove command name
-    shift
-    # Check if we have a delay and sleep
-    if [ -z "$1" ]; then
-        fdc_error "USAGE ERROR: $0 delay <time> ..."
-        exit 1
-    fi
-    sleep "$1"
-    # Remove delay and exec command
-    shift
-    exec "$@"
+	# Remove command name
+	shift
+	# Check if we have a delay and sleep
+	if [ -z "$1" ]; then
+		fdc_error "USAGE ERROR: $0 delay <time> ..."
+		exit 1
+	fi
+	sleep "$1"
+	# Remove delay and exec command
+	shift
+	exec "$@"
 
 else
-    usage_error
+	usage_error
 fi
