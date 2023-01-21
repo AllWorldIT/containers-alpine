@@ -19,10 +19,14 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
+
 # If there are cron.d files, enable crond
 if [ "$(find /etc/cron.d -type f -prune | wc -l)" -gt 0 ]; then
-	echo "NOTICE: Enabling crond..."
-	mv /etc/supervisor/conf.d/crond.conf{.disabled,}
+	fdc_notice "Enabling crond"
+	# NK: Check the service has not been moved yet
+	if [ ! -e /etc/supervisor/conf.d/crond.conf ]; then
+		mv /etc/supervisor/conf.d/crond.conf{.disabled,}
+	fi
 else
-	echo "NOTICE: Disabling crond, no crontabs"
+	fdc_notice "Disabling crond, no crontabs"
 fi

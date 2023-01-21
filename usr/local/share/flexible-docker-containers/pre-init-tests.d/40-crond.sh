@@ -19,7 +19,7 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
-echo "NOTICE: Setting up crontab for CI testing..."
+fdc_notice "Setting up crontab for CI testing"
 cat <<EOF > /etc/cron.d/40-cron-test
 @reboot root touch /PASSED_CROND
 EOF
