@@ -7,9 +7,7 @@
 This is the Conarx Containers Alpine Linux base image, it is built specifically with re-use in mind along with flexible
 initialization, unit testing and supports advanced health checks.
 
-These additional container features we call Flexible Docker Containers.
-
-Notable software included:
+Software included with our Alpine base image...
 
 - bash
 - cronie
@@ -29,6 +27,7 @@ It will be started 10 seconds after container start, but only if crontabs were a
 We include Supervisord to manage services started within the container.
 
 
+
 # Mirrors
 
 |  Provider  |  Repository                            |
@@ -38,9 +37,36 @@ We include Supervisord to manage services started within the container.
 
 
 
+# Conarx Containers
+
+All our Docker images are part of our Conarx Containers product line. Images are generally based on Alpine Linux and track the
+Alpine Linux major and minor version in the format of `vXX.YY`.
+
+Images built from source track both the Alpine Linux major and minor versions in addition to the main software component being
+built in the format of `vXX.YY-AA.BB`, where `AA.BB` is the main software component version.
+
+Our images are built using our Flexible Docker Containers framework which includes the below features...
+
+- Flexible container initialization and startup
+- Integrated unit testing
+- Advanced multi-service health checks
+- Native IPv6 support for all containers
+- Debugging options
+
+
+
+# Community Support
+
+Please use the project [Issue Tracker](https://gitlab.conarx.tech/containers/alpine/-/issues).
+
+
+
 # Commercial Support
 
-Commercial support is available from [Conarx](https://conarx.tech).
+Commercial support for all our Docker images is available from [Conarx](https://conarx.tech).
+
+We also provide consulting services to create and maintain Docker images to meet your exact needs.
+
 
 
 # Environment Variables
@@ -86,14 +112,19 @@ docker run -it --rm -e FDC_DISABLE_SUPERVISORD=1 $IMAGE /bin/bash
 
 
 
-# Volumes
+# Crontab Configuration
 
 
-## /etc/cron.d
+## Directory: /etc/cron.d
 
 Crontab files can be mounted individually within this directory to implement scheduled tasks.
 
 Note: The Cronie contab format includes a `user` field, refer to [crontab.5](https://linux.die.net/man/5/crontab) for more info.
+
+```
+# min   hour    day     month   weekday   user    command
+*/1     *       *       *       *         root    /some/command
+```
 
 
 # Extending Using Flexible Docker Containers
@@ -151,7 +182,7 @@ check.
 Files will be sourced in when `docker-healthcheck` is run as part of `HEALTHCHECK`. The purpose of this directory
 is to add any health checks in a stacked container environment.
 
-Consider outputting a usable message when a healthcheck fails to help with debugging.
+Consider outputting a usable message when a health check fails to help with debugging.
 
 
 # Writing Tests
