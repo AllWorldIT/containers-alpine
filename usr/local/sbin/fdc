@@ -59,6 +59,7 @@ function show_version_info() {
 function fdc_start() {
 	# Check if we're setting up debugging
 	if [ -n "$FDC_DEBUG" ]; then
+		fdc_info "Enabling DEBUG mode"
 		set -x
 	fi
 
@@ -117,7 +118,9 @@ function fdc_start() {
 	if [ $# -gt 0 ]; then
 		fdc_info "Ready for start up with manual command"
 		# Check if we're disabling supervisord
-		if [ -z "$FDC_DISABLE_SUPERVISORD" ]; then
+		if [ -n "$FDC_DISABLE_SUPERVISORD" ]; then
+			fdc_notice "Disabling supervisord"
+		else
 			/usr/bin/env -i /usr/bin/supervisord --config /etc/supervisor/supervisord.conf \
 					--logfile /var/log/supervisord.log \
 					--logfile_maxbytes=1000000 \
@@ -125,6 +128,7 @@ function fdc_start() {
 		fi
 		# Run custom command
 		cd /root
+		fdc_info "Running custom command: $*"
 		exec "$@"
 	else
 		fdc_info "Ready for start up"
