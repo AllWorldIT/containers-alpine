@@ -38,13 +38,13 @@ function dot_d_files() {
 	fi
 
 	cd "$dot_d_dir"
-	while read -r _f; do
-		# Ensure we source the file from the correct place if a script changes us to somewhere else
-		cd "/usr/local/share/flexible-docker-containers/$dot_d_dir"
-		fdc_info "$dot_d_dir - Processing [$_f]"
-		. "$_f"
+	local f
+	while read -r f; do
+		fdc_info "$dot_d_dir - Processing [$f]"
+		. "/usr/local/share/flexible-docker-containers/$dot_d_dir/$f"
 	done < <(find . -type f -name '*.sh' | cut -d/ -f2- | sort -n)
 }
+
 
 # Show version info
 function show_version_info() {
@@ -164,6 +164,7 @@ function usage_error() {
 	fdc_error "USAGE ERROR: $0 <start|healthcheck|set-perms|delay>"
 	exit 1
 }
+
 
 
 . /usr/local/share/flexible-docker-containers/lib/logging.sh
