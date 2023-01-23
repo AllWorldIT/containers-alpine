@@ -1,3 +1,4 @@
+#!/bin/bash
 # Copyright (c) 2022-2023, AllWorldIT.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -20,8 +21,13 @@
 
 
 function fdc_color() {
-	local color=${1:-grey}
+	local color=${1:-reset}
+	local bgcolor=$2
+
 	case "$color" in
+		black)
+			color=30
+			;;
 		red)
 			color=31
 			;;
@@ -34,14 +40,59 @@ function fdc_color() {
 		blue)
 			color=34
 			;;
-		grey | reset)
+		purple)
+			color=35
+			;;
+		cyan)
+			color=36
+			;;
+		white)
+			color=37
+			;;
+		reset)
 			color=0
 			;;
 		*)
 			echo "INTERNAL ERROR: Invalid color '$color'" >&2
 			;;
 	esac
-	printf "\033[1;%sm" "$color"
+
+	if [ -n "$bgcolor" ]; then
+		case "$bgcolor" in
+			black)
+				bgcolor=40
+				;;
+			red)
+				bgcolor=41
+				;;
+			green)
+				bgcolor=42
+				;;
+			yellow)
+				bgcolor=43
+				;;
+			blue)
+				bgcolor=44
+				;;
+			purple)
+				bgcolor=45
+				;;
+			cyan)
+				bgcolor=46
+				;;
+			white)
+				bgcolor=47
+				;;
+			reset)
+				bgcolor=0
+				;;
+			*)
+				echo "INTERNAL ERROR: Invalid bgcolor '$bgcolor'" >&2
+				;;
+		esac
+		bgcolor=";$bgcolor"
+	fi
+	printf "\033[1;%s%sm" "$color" "$bgcolor"
 }
 
 
@@ -50,65 +101,70 @@ function fdc_color() {
 #
 
 function fdc_error() {
-	local color
+	local color reset
 	color=$(fdc_color red)
 	reset=$(fdc_color reset)
 	echo -e "$color>>> ERROR  > $1$reset" >&2
 }
 
 function fdc_warn() {
-	local color
+	local color reset
 	color=$(fdc_color yellow)
 	reset=$(fdc_color reset)
 	echo -e "$color>>> WARNING > $1$reset" >&2
 }
 
 function fdc_notice() {
-	local color
+	local color reset
 	color=$(fdc_color blue)
 	reset=$(fdc_color reset)
 	echo -e "$color>>> NOTICE  > $1$reset" >&2
 }
 
 function fdc_info() {
-	local color
-	color=$(fdc_color grey)
+	local color reset
+	color=$(fdc_color white)
 	reset=$(fdc_color reset)
 	echo -e "$color>>> INFO    > $1$reset" >&2
 }
 
 
 function fdc_test_start() {
-	local color
+	local color color2 reset
 	color=$(fdc_color blue)
+	color2=$(fdc_color purple)
 	reset=$(fdc_color reset)
-	echo -e "$color### TEST START    ($reset$1$color): $2$reset" >&2
+	echo -e "$color### TEST START    ($color2$1$color): $2$reset" >&2
 }
 
 function fdc_test_progress() {
-	local color
+	local color color2 reset
 	color=$(fdc_color blue)
+	color2=$(fdc_color purple)
 	reset=$(fdc_color reset)
-	echo -e "$color### TEST PROGRESS ($reset$1$color): $2$reset" >&2
+	echo -e "$color### TEST PROGRESS ($color2$1$color): $2$reset" >&2
 }
 
 function fdc_test_pass() {
-	local color
+	local color color2 reset
 	color=$(fdc_color green)
+	color2=$(fdc_color purple)
 	reset=$(fdc_color reset)
-	echo -e "$color### TEST PASSED   ($reset$1$color): $2$reset" >&2
+	echo -e "$color### TEST PASSED   ($color2$1$color): $2$reset" >&2
 }
 
 function fdc_test_info() {
-	local color
+	local color color2 reset
 	color=$(fdc_color blue)
+	color2=$(fdc_color purple)
 	reset=$(fdc_color reset)
-	echo -e "$color### TEST INFO     ($reset$1$color): $2$reset" >&2
+	echo -e "$color### TEST INFO     ($color2$1$color): $2$reset" >&2
 }
 
 function fdc_test_fail() {
-	local color
+	local color color2 reset
 	color=$(fdc_color red)
+	color2=$(fdc_color purple)
 	reset=$(fdc_color reset)
-	echo -e "$color### TEST FAILED   ($reset$1$color): $2$reset" >&2
+	echo -e "$color### TEST FAILED   ($color2$1$color): $2$reset" >&2
 }
