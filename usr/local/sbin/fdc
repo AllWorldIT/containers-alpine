@@ -102,7 +102,7 @@ function fdc_start() {
 			# shellcheck disable=SC2154,SC2064
 			trap "
 				rv=\$?
-				color=\$(fdc_color yellow)
+				color=\$(fdc_color yellow bold)
 				reset=\$(fdc_color reset)
 				echo \"\${color}Exit code: \$rv\$reset\"
 				fdc_info 'Cleanup: supervisord'
