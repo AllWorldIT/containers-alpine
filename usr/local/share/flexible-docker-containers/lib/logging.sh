@@ -23,6 +23,7 @@
 function fdc_color() {
 	local color=${1:-reset}
 	local bgcolor=$2
+	local style=$3
 
 	case "$color" in
 		black)
@@ -92,7 +93,32 @@ function fdc_color() {
 		esac
 		bgcolor=";$bgcolor"
 	fi
-	printf "\033[1;%s%sm" "$color" "$bgcolor"
+
+	if [ -n "$style" ]; then
+		case "$style" in
+			normal)
+				style=0
+				;;
+			bold)
+				style=1
+				;;
+			underline)
+				style=4
+				;;
+			blink)
+				style=5
+				;;
+			reverse)
+				style=7
+				;;
+			*)
+				echo "INTERNAL ERROR: Invalid style '$style'" >&2
+				;;
+		esac
+		style=";$style"
+	fi
+
+	printf "\033[%s%s%sm" "$color" "$style" "$bgcolor"
 }
 
 
