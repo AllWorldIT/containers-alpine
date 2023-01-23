@@ -128,28 +128,28 @@ function fdc_color() {
 
 function fdc_error() {
 	local color reset
-	color=$(fdc_color red)
+	color=$(fdc_color red "" bold)
 	reset=$(fdc_color reset)
 	echo -e "$color>>> ERROR  > $1$reset" >&2
 }
 
 function fdc_warn() {
 	local color reset
-	color=$(fdc_color yellow)
+	color=$(fdc_color yellow "" bold)
 	reset=$(fdc_color reset)
 	echo -e "$color>>> WARNING > $1$reset" >&2
 }
 
 function fdc_notice() {
 	local color reset
-	color=$(fdc_color blue)
+	color=$(fdc_color blue "" bold)
 	reset=$(fdc_color reset)
 	echo -e "$color>>> NOTICE  > $1$reset" >&2
 }
 
 function fdc_info() {
 	local color reset
-	color=$(fdc_color white)
+	color=$(fdc_color white "" bold)
 	reset=$(fdc_color reset)
 	echo -e "$color>>> INFO    > $1$reset" >&2
 }
@@ -157,7 +157,7 @@ function fdc_info() {
 
 function fdc_test_start() {
 	local color color2 reset
-	color=$(fdc_color blue)
+	color=$(fdc_color blue "" bold)
 	color2=$(fdc_color purple)
 	reset=$(fdc_color reset)
 	echo -e "$color### TEST START    ($color2$1$color): $2$reset" >&2
@@ -165,7 +165,7 @@ function fdc_test_start() {
 
 function fdc_test_progress() {
 	local color color2 reset
-	color=$(fdc_color blue)
+	color=$(fdc_color blue "" bold)
 	color2=$(fdc_color purple)
 	reset=$(fdc_color reset)
 	echo -e "$color### TEST PROGRESS ($color2$1$color): $2$reset" >&2
@@ -173,7 +173,7 @@ function fdc_test_progress() {
 
 function fdc_test_pass() {
 	local color color2 reset
-	color=$(fdc_color green)
+	color=$(fdc_color green "" bold)
 	color2=$(fdc_color purple)
 	reset=$(fdc_color reset)
 	echo -e "$color### TEST PASSED   ($color2$1$color): $2$reset" >&2
@@ -181,7 +181,7 @@ function fdc_test_pass() {
 
 function fdc_test_info() {
 	local color color2 reset
-	color=$(fdc_color blue)
+	color=$(fdc_color blue "" bold)
 	color2=$(fdc_color purple)
 	reset=$(fdc_color reset)
 	echo -e "$color### TEST INFO     ($color2$1$color): $2$reset" >&2
@@ -189,7 +189,7 @@ function fdc_test_info() {
 
 function fdc_test_fail() {
 	local color color2 reset
-	color=$(fdc_color red)
+	color=$(fdc_color red "" bold)
 	color2=$(fdc_color purple)
 	reset=$(fdc_color reset)
 	echo -e "$color### TEST FAILED   ($color2$1$color): $2$reset" >&2
