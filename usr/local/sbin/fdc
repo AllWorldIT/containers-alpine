@@ -20,7 +20,7 @@
 # IN THE SOFTWARE.
 
 
-VERSION=1.0.0
+VERSION=1.1.0
 export FDC_VERSION=$VERSION
 
 
@@ -38,19 +38,19 @@ function dot_d_files() {
 	fi
 
 	cd "$dot_d_dir"
-	while read -r _f; do
-		# Ensure we source the file from the correct place if a script changes us to somewhere else
-		cd "/usr/local/share/flexible-docker-containers/$dot_d_dir"
-		fdc_info "$dot_d_dir - Processing [$_f]"
-		. "$_f"
+	local f
+	while read -r f; do
+		fdc_info "$dot_d_dir - Processing [$f]"
+		. "/usr/local/share/flexible-docker-containers/$dot_d_dir/$f"
 	done < <(find . -type f -name '*.sh' | cut -d/ -f2- | sort -n)
 }
+
 
 # Show version info
 function show_version_info() {
 	if [ -e /.VERSION_INFO ]; then
-		fdc_info "Flexible Docker Container Version Information"
-		cat /.VERSION_INFO
+		fdc_info "Flexible Docker Containers -- Layer Version Information"
+		rev < /.VERSION_INFO
 	fi
 }
 
@@ -59,6 +59,7 @@ function show_version_info() {
 function fdc_start() {
 	# Check if we're setting up debugging
 	if [ -n "$FDC_DEBUG" ]; then
+		fdc_info "Enabling DEBUG mode"
 		set -x
 	fi
 
@@ -92,20 +93,25 @@ function fdc_start() {
 	# Check if we're running in CI mode
 	if [ -n "$FDC_CI" ]; then
 		fdc_notice "Running in TEST mode"
-		/usr/bin/env -i /usr/bin/supervisord --nodaemon --config /etc/supervisor/supervisord.conf &
-		SUPERVISORD_PID=$!
-		# shellcheck disable=SC2154,SC2064
-		trap "
-			rv=\$?
-			color=\$(fdc_color yellow)
-			reset=\$(fdc_color reset)
-			echo \"\${color}Exit code: \$rv\$reset\"
-			fdc_info 'Cleanup: supervisord'
-			kill $SUPERVISORD_PID
-			exit \$rv
-		" EXIT
-		fdc_info "Waiting 5s before running tests"
-		sleep 5
+		# Check if we're disabling supervisord
+		if [ -n "$FDC_DISABLE_SUPERVISORD" ]; then
+			fdc_notice "Disabling supervisord"
+		else
+			/usr/bin/env -i /usr/bin/supervisord --nodaemon --config /etc/supervisor/supervisord.conf &
+			SUPERVISORD_PID=$!
+			# shellcheck disable=SC2154,SC2064
+			trap "
+				rv=\$?
+				color=\$(fdc_color yellow '' bold)
+				reset=\$(fdc_color reset)
+				echo \"\${color}Exit code: \$rv\$reset\"
+				fdc_info 'Cleanup: supervisord'
+				kill $SUPERVISORD_PID
+				exit \$rv
+			" EXIT
+			fdc_info "Waiting 5s before running tests"
+			sleep 5
+		fi
 		# Execute any tests.d scripts
 		fdc_info "Running tests"
 		dot_d_files tests
@@ -117,7 +123,9 @@ function fdc_start() {
 	if [ $# -gt 0 ]; then
 		fdc_info "Ready for start up with manual command"
 		# Check if we're disabling supervisord
-		if [ -z "$FDC_DISABLE_SUPERVISORD" ]; then
+		if [ -n "$FDC_DISABLE_SUPERVISORD" ]; then
+			fdc_notice "Disabling supervisord"
+		else
 			/usr/bin/env -i /usr/bin/supervisord --config /etc/supervisor/supervisord.conf \
 					--logfile /var/log/supervisord.log \
 					--logfile_maxbytes=1000000 \
@@ -125,6 +133,7 @@ function fdc_start() {
 		fi
 		# Run custom command
 		cd /root
+		fdc_info "Running custom command: $*"
 		exec "$@"
 	else
 		fdc_info "Ready for start up"
@@ -166,10 +175,13 @@ function usage_error() {
 }
 
 
+
 . /usr/local/share/flexible-docker-containers/lib/logging.sh
 
 if [ "$1" == "start" ]; then
-	echo "Flexible Docker Containers v$VERSION - Copyright (c) 2023, AllWorldIT" >&2
+	color=$(fdc_color blue white bold)
+	reset=$(fdc_color reset)
+	echo "${color}>>> Flexible Docker Containers v$VERSION - Copyright (c) 2023, AllWorldIT <<<${reset}" >&2
 	shift
 	fdc_start "$@"
 
