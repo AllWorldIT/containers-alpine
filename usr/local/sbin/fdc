@@ -179,7 +179,7 @@ function usage_error() {
 . /usr/local/share/flexible-docker-containers/lib/logging.sh
 
 if [ "$1" == "start" ]; then
-	color=$(fdc_color "cyan" "white")
+	color=$(fdc_color blue white)
 	reset=$(fdc_color reset)
 	echo "${color}Flexible Docker Containers v$VERSION - Copyright (c) 2023, AllWorldIT${reset}" >&2
 	shift
