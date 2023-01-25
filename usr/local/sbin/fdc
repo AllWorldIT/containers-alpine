@@ -50,7 +50,7 @@ function dot_d_files() {
 function show_version_info() {
 	if [ -e /.VERSION_INFO ]; then
 		fdc_info "Flexible Docker Containers -- Layer Version Information"
-		rev < /.VERSION_INFO
+		tac /.VERSION_INFO
 	fi
 }
 
