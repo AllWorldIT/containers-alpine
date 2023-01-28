@@ -50,6 +50,9 @@ function fdc_color() {
 		white)
 			color=37
 			;;
+		grey)
+			color=90
+			;;
 		reset)
 			color=0
 			;;
@@ -83,6 +86,9 @@ function fdc_color() {
 				;;
 			white)
 				bgcolor=47
+				;;
+			grey)
+				bgcolor=100
 				;;
 			reset)
 				bgcolor=0
