@@ -28,6 +28,8 @@ LABEL org.opencontainers.image.base.name = "docker.io/library/alpine:3.17"
 
 
 RUN set -eux; \
+	true "Upgrade Alpine"; \
+	apk upgrade --no-cache; \
 	true "Bash"; \
 	apk add --no-cache bash; \
 	true "Supervisord"; \
@@ -40,6 +42,8 @@ RUN set -eux; \
 		/etc/crontabs/* \
 		/etc/periodic; \
 	apk add --no-cache cronie; \
+	true "Security - minimum version requirements"; \
+	apk list --no-cache 2>&1 | grep libssl3; apk add --no-cache "libssl3>3.0.8"; \
 	true "Cleanup"; \
 	rm -f /var/cache/apk/*; \
 	mkdir -p \
