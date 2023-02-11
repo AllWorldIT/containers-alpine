@@ -90,6 +90,24 @@ function fdc_start() {
 	# Execute any pre-exec.d scripts
 	dot_d_files pre-exec
 
+	# If we have commandline arguments, we need to background supervisord and run the command provided
+	if [ $# -gt 0 ]; then
+		fdc_info "Ready for start up with manual command"
+		# Check if we're disabling supervisord
+		if [ -n "$FDC_DISABLE_SUPERVISORD" ]; then
+			fdc_notice "Disabling supervisord"
+		else
+			/usr/bin/env -i /usr/bin/supervisord --config /etc/supervisor/supervisord.conf \
+					--logfile /var/log/supervisord.log \
+					--logfile_maxbytes=1000000 \
+					--logfile_backups=8
+		fi
+		# Run custom command
+		cd /root
+		fdc_info "Running custom command: $*"
+		exec "$@"
+	fi
+
 	# Check if we're running in CI mode
 	if [ -n "$FDC_CI" ]; then
 		fdc_notice "Running in TEST mode"
@@ -119,26 +137,9 @@ function fdc_start() {
 		exit 0
 	fi
 
-	# If we have commandline arguments, we need to background supervisord and run the command provided
-	if [ $# -gt 0 ]; then
-		fdc_info "Ready for start up with manual command"
-		# Check if we're disabling supervisord
-		if [ -n "$FDC_DISABLE_SUPERVISORD" ]; then
-			fdc_notice "Disabling supervisord"
-		else
-			/usr/bin/env -i /usr/bin/supervisord --config /etc/supervisor/supervisord.conf \
-					--logfile /var/log/supervisord.log \
-					--logfile_maxbytes=1000000 \
-					--logfile_backups=8
-		fi
-		# Run custom command
-		cd /root
-		fdc_info "Running custom command: $*"
-		exec "$@"
-	else
-		fdc_info "Ready for start up"
-		exec /usr/bin/env -i /usr/bin/supervisord --nodaemon --config /etc/supervisor/supervisord.conf
-	fi
+	# Normal startup
+	fdc_info "Ready for start up"
+	exec /usr/bin/env -i /usr/bin/supervisord --nodaemon --config /etc/supervisor/supervisord.conf
 }
 
 
