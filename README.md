@@ -190,28 +190,28 @@ Consider outputting a usable message when a health check fails to help with debu
 Tests should be written as below...
 
 ```sh
-echo "TEST START (healthcheck): Check healthcheck works..."
-if ! fdc healthcheck; then
-	echo "TEST FAILED (healthcheck): Did not succeed"
+fdc_test_start someapp "Checking someapp works"
+if ! someapptest; then
+	fdc_test_fail someapp "Did not succeed"
 	false
 fi
-echo "TEST PASSED (healthcheck): Ran OK"
+fdc_test_pass someapp "Ran OK"
 ```
 
 If you need to wait, it can be implmented like this...
 
 ```sh
-echo "TEST START (crond): Check running..."
+fdc_test_start someapp "Check running"
 for i in {30..0}; do
-    if ! pgrep crond > /dev/null; then
+    if ! pgrep someapp > /dev/null; then
         break
     fi
-    echo "TEST PROGRESS (crond): Waiting for crond to start... ${i}s"
+	fdc_test_progress someapp "Waiting for crond to start... ${i}s"
     sleep 1
 done
 if [ "$i" = 0 ]; then
-	echo "TEST FAILED (crond): Did not start!"
+	fdc_test_fail someapp "Did not start"
 	false
 fi
-echo "TEST PASSED (crond): Started"
+fdc_test_pass someapp "Started"
 ```
