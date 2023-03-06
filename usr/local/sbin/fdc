@@ -57,6 +57,9 @@ function show_version_info() {
 
 # Startup container
 function fdc_start() {
+	# Save our args so they can be modified
+	DOCKER_ARGS=("$@")
+
 	# Check if we're setting up debugging
 	if [ -n "$FDC_DEBUG" ]; then
 		fdc_info "Enabling DEBUG mode"
@@ -72,7 +75,7 @@ function fdc_start() {
 		fdc_notice "Disabling entrypoint"
 		# Run custom command
 		cd /root
-		exec "$@"
+		exec "${DOCKER_ARGS[@]}"
 	fi
 
 	# If we're running in CI mode, check if we have pre-init-tests.d to run
@@ -91,7 +94,7 @@ function fdc_start() {
 	dot_d_files pre-exec
 
 	# If we have commandline arguments, we need to background supervisord and run the command provided
-	if [ $# -gt 0 ]; then
+	if [ "${#DOCKER_ARGS}" -gt 0 ]; then
 		fdc_info "Ready for start up with manual command"
 		# Check if we're disabling supervisord
 		if [ -n "$FDC_DISABLE_SUPERVISORD" ]; then
@@ -105,7 +108,7 @@ function fdc_start() {
 		# Run custom command
 		cd /root
 		fdc_info "Running custom command: $*"
-		exec "$@"
+		exec "${DOCKER_ARGS[@]}"
 	fi
 
 	# Check if we're running in CI mode
