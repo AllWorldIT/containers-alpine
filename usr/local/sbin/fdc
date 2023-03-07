@@ -107,7 +107,7 @@ function fdc_start() {
 		fi
 		# Run custom command
 		cd /root
-		fdc_info "Running custom command: $*"
+		fdc_info "Running custom command: ${DOCKER_ARGS[@]}"
 		exec "${DOCKER_ARGS[@]}"
 	fi
 
