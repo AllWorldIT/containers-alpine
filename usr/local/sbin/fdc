@@ -41,6 +41,7 @@ function dot_d_files() {
 	local f
 	while read -r f; do
 		fdc_info "$dot_d_dir - Processing [$f]"
+		# shellcheck disable=SC1090
 		. "/usr/local/share/flexible-docker-containers/$dot_d_dir/$f"
 	done < <(find . -type f -name '*.sh' | cut -d/ -f2- | sort -n)
 }
@@ -107,7 +108,7 @@ function fdc_start() {
 		fi
 		# Run custom command
 		cd /root
-		fdc_info "Running custom command: ${DOCKER_ARGS[@]}"
+		fdc_info "Running custom command: ${DOCKER_ARGS[*]}"
 		exec "${DOCKER_ARGS[@]}"
 	fi
 
