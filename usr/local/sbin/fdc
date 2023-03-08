@@ -181,6 +181,7 @@ function usage_error() {
 
 
 
+# shellcheck disable=SC1091
 . /usr/local/share/flexible-docker-containers/lib/logging.sh
 
 if [ "$1" == "start" ]; then
