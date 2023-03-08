@@ -20,7 +20,7 @@
 # IN THE SOFTWARE.
 
 
-VERSION=1.3.0
+VERSION=1.3.2
 export FDC_VERSION=$VERSION
 
 
@@ -41,6 +41,7 @@ function dot_d_files() {
 	local f
 	while read -r f; do
 		fdc_info "$dot_d_dir - Processing [$f]"
+		# shellcheck disable=SC1090
 		. "/usr/local/share/flexible-docker-containers/$dot_d_dir/$f"
 	done < <(find . -type f -name '*.sh' | cut -d/ -f2- | sort -n)
 }
@@ -107,7 +108,7 @@ function fdc_start() {
 		fi
 		# Run custom command
 		cd /root
-		fdc_info "Running custom command: ${DOCKER_ARGS[@]}"
+		fdc_info "Running custom command: ${DOCKER_ARGS[*]}"
 		exec "${DOCKER_ARGS[@]}"
 	fi
 
@@ -180,6 +181,7 @@ function usage_error() {
 
 
 
+# shellcheck disable=SC1091
 . /usr/local/share/flexible-docker-containers/lib/logging.sh
 
 if [ "$1" == "start" ]; then
