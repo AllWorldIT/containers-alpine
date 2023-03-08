@@ -148,6 +148,7 @@ function fdc_warn() {
 
 function fdc_notice() {
 	local color reset
+	[ -n "$FDC_QUIET" ] && return
 	color=$(fdc_color blue "" bold)
 	reset=$(fdc_color reset)
 	echo -e "$color>>> NOTICE  > $1$reset" >&2
@@ -155,6 +156,7 @@ function fdc_notice() {
 
 function fdc_info() {
 	local color reset
+	[ -n "$FDC_QUIET" ] && return
 	color=$(fdc_color white "" bold)
 	reset=$(fdc_color reset)
 	echo -e "$color>>> INFO    > $1$reset" >&2
