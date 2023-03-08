@@ -110,6 +110,10 @@ An example of using this would be...
 docker run -it --rm -e FDC_DISABLE_SUPERVISORD=1 $IMAGE /bin/bash
 ```
 
+## FDC_QUIET
+
+Supress info and notice level messages and only output warnings and errors.
+
 
 
 # Crontab Configuration
