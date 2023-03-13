@@ -160,6 +160,12 @@ This directory is used to initialize the container environment, prepare any data
 and execute any upgrade steps required.
 
 
+## Directory: /usr/local/share/flexible-docker-containers/pre-exec-tests.d
+
+Files will be sourced in before `/usr/local/share/flexible-docker-containers/pre-exec.d` and the purpose of which is to perform any
+tasks that require the container initialization to of already taken place.
+
+
 ## Directory: /usr/local/share/flexible-docker-containers/pre-exec.d
 
 Files will be sourced in after container initialization done in `/usr/local/share/flexible-docker-containers/init.d`, the purpose
