@@ -91,6 +91,12 @@ function fdc_start() {
 	# Execute any init.d scripts
 	dot_d_files init
 
+	# If we're running in CI mode, check if we have pre-exec-tests.d to run
+	if [ -n "$FDC_CI" ]; then
+		# Execute any pre-exec-tests.d scripts
+		dot_d_files pre-exec-tests
+	fi
+
 	# Execute any pre-exec.d scripts
 	dot_d_files pre-exec
 
