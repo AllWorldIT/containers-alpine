@@ -51,6 +51,7 @@ RUN set -eux; \
 		/usr/local/share/flexible-docker-containers/pre-init-tests.d \
 		/usr/local/share/flexible-docker-containers/pre-init.d \
 		/usr/local/share/flexible-docker-containers/init.d \
+		/usr/local/share/flexible-docker-containers/pre-exec-tests.d \
 		/usr/local/share/flexible-docker-containers/pre-exec.d \
 		/usr/local/share/flexible-docker-containers/tests.d \
 		/usr/local/share/flexible-docker-containers/healthcheck.d
