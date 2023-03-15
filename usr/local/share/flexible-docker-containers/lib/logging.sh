@@ -195,6 +195,14 @@ function fdc_test_info() {
 	echo -e "$color### TEST INFO     ($color2$1$color): $2$reset" >&2
 }
 
+function fdc_test_alert() {
+	local color color2 reset
+	color=$(fdc_color yellow "" bold)
+	color2=$(fdc_color purple)
+	reset=$(fdc_color reset)
+	echo -e "$color### TEST ALERT    ($color2$1$color): $2$reset" >&2
+}
+
 function fdc_test_fail() {
 	local color color2 reset
 	color=$(fdc_color red "" bold)
