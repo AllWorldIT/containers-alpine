@@ -1,0 +1,22 @@
+# From https://gitlab.alpinelinux.org/alpine/abuild/-/blob/master/default.conf
+
+export CFLAGS="-Os -Wformat -Werror=format-security"
+export CXXFLAGS="-Os -Wformat -Werror=format-security"
+export CPPFLAGS="-Os -Wformat -Werror=format-security"
+export LDFLAGS="-Wl,--as-needed,-O1,--sort-common"
+export GOFLAGS="-buildmode=pie -modcacherw -trimpath -buildvcs=false"
+# Do note that these should work with at least GDC and LDC
+export DFLAGS="-Os"
+
+export JOBS=$(nproc)
+export MAX_BUILD_LOAD=8
+export MAKEFLAGS="-j$JOBS -l$MAX_BUILD_LOAD"
+export SAMUFLAGS=-j$JOBS
+export CARGO_BUILD_JOBS=$JOBS
+export CTEST_PARALLEL_LEVEL=$JOBS
+
+export CARGO_PROFILE_RELEASE_OPT_LEVEL="s"
+export CARGO_PROFILE_RELEASE_PANIC="abort"
+export CARGO_PROFILE_RELEASE_CODEGEN_UNITS=1
+export CARGO_PROFILE_RELEASE_LTO="true"
+export CARGO_REGISTRIES_CRATES_IO_PROTOCOL="sparse"
