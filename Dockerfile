@@ -83,6 +83,8 @@ COPY usr/local/share/flexible-docker-containers/pre-init-tests.d/40-crond.sh /us
 COPY usr/local/share/flexible-docker-containers/init.d/40-crond.sh /usr/local/share/flexible-docker-containers/init.d
 COPY usr/local/share/flexible-docker-containers/healthcheck.d/40-crond.sh /usr/local/share/flexible-docker-containers/healthcheck.d
 
+# Build flags
+COPY etc/buildflags /etc/buildflags
 
 # Install Flexible Docker Containers
 COPY usr/local/sbin/fdc /usr/local/sbin/
@@ -93,8 +95,11 @@ RUN set -eux; \
 	if [ -n "$VERSION_INFO" ]; then echo "$VERSION_INFO" >> /.VERSION_INFO; fi; \
 	true "Permissions"; \
 	chown root:root \
+		/etc/buildflags \
 		/usr/local/sbin/fdc \
 		/usr/local/share/flexible-docker-containers/*; \
+	chmod 0644 \
+		/etc/buildflags; \
 	chmod 0755 \
 		/usr/local/sbin/fdc \
 		/usr/local/share/flexible-docker-containers/*; \
