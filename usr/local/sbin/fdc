@@ -20,7 +20,7 @@
 # IN THE SOFTWARE.
 
 
-VERSION=1.5.0
+VERSION=1.6.0
 export FDC_VERSION=$VERSION
 
 
@@ -38,12 +38,21 @@ function dot_d_files() {
 	fi
 
 	cd "$dot_d_dir"
-	local f
-	while read -r f; do
-		fdc_info "$dot_d_dir - Processing [$f]"
-		# shellcheck disable=SC1090
-		. "/usr/local/share/flexible-docker-containers/$dot_d_dir/$f"
+	local dot_d_files dot_d_file
+	# NK: We pre-build a list of files to source as some of them may be creating sub-shells themselves, with multiple sub-shells
+	#     piping data and with while loops, it seems to create some kind of confusing in bash causing this loop with piped file
+	#     names to prematurely exit.
+	# Build list of files
+	dot_d_files=()
+	while read -r dot_d_file; do
+		dot_d_files+=("$dot_d_file")
 	done < <(find . -type f -name '*.sh' | cut -d/ -f2- | sort -n)
+	# Loop through each file one by one
+	for dot_d_file in "${dot_d_files[@]}"; do
+		fdc_info "$dot_d_dir - Processing [$dot_d_file]"
+		# shellcheck disable=SC1090
+		. "/usr/local/share/flexible-docker-containers/$dot_d_dir/$dot_d_file"
+	done
 }
 
 
