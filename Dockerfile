@@ -26,6 +26,7 @@ LABEL org.opencontainers.image.authors   "Nigel Kukard <nkukard@conarx.tech>"
 LABEL org.opencontainers.image.version   "3.18"
 LABEL org.opencontainers.image.base.name "docker.io/library/alpine:3.18"
 
+COPY patches/supervisord-reap.patch /root/supervisord-reap.patch
 
 RUN set -eux; \
 	true "Upgrade Alpine"; \
@@ -63,7 +64,12 @@ RUN set -eux; \
 		chown root:root \
 			/etc/supervisor/supervisord.conf; \
 		chmod 0644 \
-			/etc/supervisor/supervisord.conf
+			/etc/supervisor/supervisord.conf; \
+		true "Hotfix Supervisord"; \
+		apk add --no-cache --virtual .patch-deps patch; \
+		patch -p0 /usr/lib/python3.11/site-packages/supervisor/supervisord.py < /root/supervisord-reap.patch; \
+		rm -f /root/supervisord-reap.patch /usr/lib/python3.11/site-packages/supervisor/supervisord.py.*; \
+		apk del --no-cache .patch-deps
 
 
 # Syslog-ng (for logging of syslog to stdout/stderr to docker)
