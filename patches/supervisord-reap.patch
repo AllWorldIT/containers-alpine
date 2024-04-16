@@ -1,8 +1,8 @@
 NK: This message message means supervisord reaped a process that it didn't know about.
 This is not an error, but it's not useful to log it as info in production.
 
---- supervisord.py      2023-10-30 10:26:21.000000000 +0000
-+++ supervisord.py.patched      2024-02-23 06:25:55.764652923 +0000
+--- supervisord.py
++++ supervisord.py.patched
 @@ -276,7 +276,7 @@
              process = self.options.pidhistory.get(pid, None)
              if process is None:
