@@ -67,8 +67,8 @@ RUN set -eux; \
 			/etc/supervisor/supervisord.conf; \
 		true "Hotfix Supervisord"; \
 		apk add --no-cache --virtual .patch-deps patch; \
-		patch -p0 /usr/lib/python3.11/site-packages/supervisor/supervisord.py < /root/supervisord-reap.patch; \
-		rm -f /root/supervisord-reap.patch /usr/lib/python3.11/site-packages/supervisor/supervisord.py.*; \
+		patch -p0 /usr/lib/python3.12/site-packages/supervisor/supervisord.py < /root/supervisord-reap.patch; \
+		rm -f /root/supervisord-reap.patch /usr/lib/python3.12/site-packages/supervisor/supervisord.py.*; \
 		apk del --no-cache .patch-deps
 
 
