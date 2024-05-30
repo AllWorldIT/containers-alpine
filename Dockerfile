@@ -55,7 +55,13 @@ RUN set -eux; \
 		/usr/local/share/flexible-docker-containers/pre-exec-tests.d \
 		/usr/local/share/flexible-docker-containers/pre-exec.d \
 		/usr/local/share/flexible-docker-containers/tests.d \
-		/usr/local/share/flexible-docker-containers/healthcheck.d
+		/usr/local/share/flexible-docker-containers/healthcheck.d; \
+	true "Default library search path"; \
+	echo "# Default library search path" > /etc/ld-musl-x86_64.path; \
+	echo "/lib" >> /etc/ld-musl-x86_64.path; \
+	echo "/usr/local/lib" >> /etc/ld-musl-x86_64.path; \
+	echo "/usr/lib" >> /etc/ld-musl-x86_64.path
+
 
 
 # Supervisord
