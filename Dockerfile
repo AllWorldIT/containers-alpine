@@ -22,9 +22,9 @@
 FROM alpine:3.20
 
 ARG VERSION_INFO=
-LABEL org.opencontainers.image.authors   "Nigel Kukard <nkukard@conarx.tech>"
-LABEL org.opencontainers.image.version   "3.20"
-LABEL org.opencontainers.image.base.name "docker.io/library/alpine:3.20"
+LABEL org.opencontainers.image.authors   = "Nigel Kukard <nkukard@conarx.tech>"
+LABEL org.opencontainers.image.version   = "3.20"
+LABEL org.opencontainers.image.base.name = "docker.io/library/alpine:3.20"
 
 COPY patches/supervisord-reap.patch /root/supervisord-reap.patch
 
